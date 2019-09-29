@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <AssemblyName>ACBC</AssemblyName>
+    <RootNamespace>ACBC</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Buss\ActiveBuss.cs" />
+    <Compile Remove="Buss\MallBuss.cs" />
+    <Compile Remove="Buss\OrderBuss.cs" />
+    <Compile Remove="Buss\RemoteBuss.cs" />
+    <Compile Remove="Buss\StoreBuss.cs" />
+    <Compile Remove="Buss\UploadBuss.cs" />
+    <Compile Remove="Dao\ActiveDao.cs" />
+    <Compile Remove="Dao\MallDao.cs" />
+    <Compile Remove="Dao\OrderDao.cs" />
+    <Compile Remove="Dao\RemoteDao.cs" />
+    <Compile Remove="Dao\StoreDao.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+    <Folder Include="新文件夹\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="aliyun.oss.sdk.core" Version="2.5.3" />
+    <PackageReference Include="EPPlus.Core" Version="1.5.4" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="MySql.Data" Version="8.0.15" />
+    <PackageReference Include="Senparc.CO2NET" Version="0.5.2" />
+    <PackageReference Include="Senparc.Weixin.Cache.Redis" Version="2.5.3" />
+    <PackageReference Include="Senparc.Weixin.Cache.Redis.RedLock" Version="1.2.5" />
+    <PackageReference Include="Senparc.Weixin.WxOpen" Version="3.3.10" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MrDatabase">
+      <HintPath>lib\MrDatabase.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
