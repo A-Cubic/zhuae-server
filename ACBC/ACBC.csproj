@@ -38,6 +38,10 @@
     <PackageReference Include="Senparc.Weixin.Cache.Redis" Version="2.5.3" />
     <PackageReference Include="Senparc.Weixin.Cache.Redis.RedLock" Version="1.2.5" />
     <PackageReference Include="Senparc.Weixin.WxOpen" Version="3.3.10" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.4.*" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.4.*" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.4.*" />
+    <PackageReference Include="System.ServiceModel.Security" Version="4.4.*" />
   </ItemGroup>
 
 
@@ -49,6 +53,10 @@
     <Reference Include="MrDatabase">
       <HintPath>lib\MrDatabase.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
 </Project>

@@ -175,6 +175,13 @@ namespace ACBC.Common
                 return Environment.GetEnvironmentVariable("SqlPwd");
             }
         }
+        public static string WebServiceUrl
+        {
+            get
+            {
+                return Environment.GetEnvironmentVariable("WebServiceUrl");
+            }
+        }
         #endregion
 
         #region 小程序相关

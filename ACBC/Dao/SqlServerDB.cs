@@ -22,7 +22,7 @@ namespace ACBC.Dao
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("server="+ Global.SqlServer+ ";Initial Catalog=GameDBZYT;" +
-                "User=" + Global.SqlUser + ";Pwd=" + Global.SqlPwd + ";");
+                "User ID=" + Global.SqlUser + ";Pwd=" + Global.SqlPwd + ";");
 
             base.OnConfiguring(optionsBuilder);
         }
