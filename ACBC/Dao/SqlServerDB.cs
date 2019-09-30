@@ -1,4 +1,5 @@
 ﻿using ACBC.Buss;
+using ACBC.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -19,8 +20,9 @@ namespace ACBC.Dao
             Database.EnsureCreated();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {   
-            optionsBuilder.UseSqlServer("server=LAPTOP-F9D0E2DE\\SQLEXPRESS;Initial Catalog=GameDBZYT;Integrated Security=True");
+        {
+            optionsBuilder.UseSqlServer("server="+ Global.SqlServer+ ";Initial Catalog=GameDBZYT;" +
+                "User=" + Global.SqlUser + ";Pwd=" + Global.SqlPwd + ";");
 
             base.OnConfiguring(optionsBuilder);
         }

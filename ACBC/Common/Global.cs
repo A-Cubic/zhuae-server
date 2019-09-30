@@ -153,6 +153,29 @@ namespace ACBC.Common
                 return Environment.GetEnvironmentVariable("ConfigServer");
             }
         }
+        #region SQLSERVER相关
+        public static string SqlServer
+        {
+            get
+            {
+                return Environment.GetEnvironmentVariable("SqlServer");
+            }
+        }
+        public static string SqlUser
+        {
+            get
+            {
+                return Environment.GetEnvironmentVariable("SqlUser");
+            }
+        }
+        public static string SqlPwd
+        {
+            get
+            {
+                return Environment.GetEnvironmentVariable("SqlPwd");
+            }
+        }
+        #endregion
 
         #region 小程序相关
 
