@@ -168,20 +168,34 @@ namespace ACBC.Dao
             DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
             if (dt != null && dt.Rows.Count > 0)
             {
-                string[] phones = new string[dt.Rows.Count];
+                //string[] phones = new string[dt.Rows.Count];
+                //for (int i = 0; i < dt.Rows.Count; i++)
+                //{
+                //    phones[i] = dt.Rows[i]["phone"].ToString();
+                //}
+                //var gdb = new SqlServerDB();
+                //list = gdb.GMember.Where(b => phones.Contains(b.ME_MobileNum)).ToList();
+
+                //string[] ids = new string[list.Count];
+                //for (int i = 0; i < list.Count; i++)
+                //{
+                //    ids[i] = list[i].ME_ID;
+                //}
+                //list1 = gdb.GRechargeDetail.Where(b => ids.Contains(b.RD_ME_ID) && b.RD_TYPE == 0).OrderByDescending(b => b.RD_Time).ToList();
+
+                string phone = "";
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
-                    phones[i] = dt.Rows[i]["phone"].ToString();
+                    if (i == 0)
+                    {
+                        phone = "'" + dt.Rows[i]["phone"].ToString() + "'";
+                    }
+                    else
+                    {
+                        phone += ",'" + dt.Rows[i]["phone"].ToString() + "'";
+                    }
                 }
-                var gdb = new SqlServerDB();
-                list = gdb.GMember.Where(b => phones.Contains(b.ME_MobileNum)).ToList();
-
-                string[] ids = new string[list.Count];
-                for (int i = 0; i < list.Count; i++)
-                {
-                    ids[i] = list[i].ME_ID;
-                }
-                list1 = gdb.GRechargeDetail.Where(b => ids.Contains(b.RD_ME_ID) && b.RD_TYPE == 0).OrderByDescending(b => b.RD_Time).ToList();
+                list1 = GetGRechargeDetailInfo(phone);
             }
             return list1;
         }
