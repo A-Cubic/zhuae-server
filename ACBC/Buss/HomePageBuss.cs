@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      using ACBC.Common;
+using ACBC.Common;
 using ACBC.Dao;
 using Newtonsoft.Json;
 using System;
@@ -47,8 +47,19 @@ namespace ACBC.Buss
                 HomePageDao homePageDao = new HomePageDao();
                 list = homePageDao.GetShowDayGoodsList(getGoodsListParam.pageNum);
                 list.Unique = getGoodsListParam.GetUnique();
-                Utils.SetCache(list,1,0,0);
+                Utils.SetCache(list, 1, 0, 0);
             }
+            return list;
+        }
+        public object Do_GetGoodsImg(BaseApi baseApi)
+        {
+            CheckAsnGoodsParam checkAsnGoodsParam = JsonConvert.DeserializeObject<CheckAsnGoodsParam>(baseApi.param.ToString());
+            if (checkAsnGoodsParam == null)
+            {
+                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
+            }
+            HomePageDao homePageDao = new HomePageDao();
+            var list = homePageDao.GetGoodsImg(checkAsnGoodsParam.goodsId);
             return list;
         }
 
@@ -90,4 +101,3 @@ namespace ACBC.Buss
         }
     }
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 

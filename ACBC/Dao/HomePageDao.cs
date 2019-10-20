@@ -86,20 +86,25 @@ namespace ACBC.Dao
         {
             List<HomePageGoods> list = new List<HomePageGoods>();
             StringBuilder builder = new StringBuilder();
-            builder.AppendFormat(OrderSqls.SELECT_HOME_GOODSLIST);
+            builder.AppendFormat(OrderSqls.SELECT_GOODS_BY_HOMEPAGE);
             string sql = builder.ToString();
             DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
             if (dt != null && dt.Rows.Count > 0)
             {
                 foreach (DataRow dr in dt.Rows)
                 {
+                    string goodsTitle = dr["GOODS_NAME"].ToString();
+                    if (goodsTitle.Length > 22)
+                    {
+                        goodsTitle = dr["GOODS_NAME"].ToString().Substring(0, 20) + "...";
+                    }
                     HomePageGoods homePageGoods = new HomePageGoods
                     {
                         goodsUrlType = "1",
-                        goodsUrl = dr["video_mp3"].ToString(),
-                        goodsName = dr["video_name"].ToString(),
-                        goodsText = dr["remark"].ToString(),
-                        goodsImg = dr["video_img"].ToString()
+                        goodsUrl = dr["GOODS_ID"].ToString(),
+                        goodsName = goodsTitle,
+                        goodsText = "",
+                        goodsImg = dr["GOODS_IMG"].ToString()
                     };
                     list.Add(homePageGoods);
                 }
@@ -163,7 +168,7 @@ namespace ACBC.Dao
         {
             ShowGoodsList showGoodsList = new ShowGoodsList();
             StringBuilder builder = new StringBuilder();
-            builder.AppendFormat(OrderSqls.SELECT_GOODS_BY_PAGENUM, pageNum*10);
+            builder.AppendFormat(OrderSqls.SELECT_GOODS_BY_PAGENUM, pageNum * 10);
             string sql = builder.ToString();
             DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
             if (dt != null)
@@ -172,7 +177,7 @@ namespace ACBC.Dao
                 foreach (DataRow dr in dt.Rows)
                 {
                     string goodsTitle = dr["GOODS_NAME"].ToString();
-                    if (goodsTitle.Length>22)
+                    if (goodsTitle.Length > 22)
                     {
                         goodsTitle = dr["GOODS_NAME"].ToString().Substring(0, 20) + "...";
                     }
@@ -181,6 +186,28 @@ namespace ACBC.Dao
                         goodsId = dr["GOODS_ID"].ToString(),
                         goodsImg = dr["GOODS_IMG"].ToString(),
                         goodsTitle = goodsTitle,
+                    };
+                    showGoodsList.list.Add(showDayGoods);
+                }
+            }
+
+            return showGoodsList;
+        }
+        public ShowGoodsList GetGoodsImg(string goodsId)
+        {
+            ShowGoodsList showGoodsList = new ShowGoodsList();
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OrderSqls.SELECT_GOODSIMG_BY_GOODSID, goodsId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null)
+            {
+                showGoodsList.list = new List<ShowGoods>();
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ShowGoods showDayGoods = new ShowGoods
+                    {
+                        goodsImg = dr["GOODS_IMG"].ToString(),
                     };
                     showGoodsList.list.Add(showDayGoods);
                 }
@@ -448,7 +475,16 @@ namespace ACBC.Dao
                 "ORDER BY SORT ASC";
             public const string SELECT_GOODS_BY_PAGENUM = ""
                 + "SELECT * "
-                + "FROM T_GOODS_DOLL  LIMIT {0},10 ";
+                + "FROM T_GOODS_DOLL ORDER BY GOODS_ID DESC  LIMIT {0},10 ";
+            public const string SELECT_GOODS_BY_HOMEPAGE = ""
+                + "SELECT * "
+                + "FROM T_GOODS_DOLL ORDER BY GOODS_ID DESC  LIMIT 0,6 ";
+            public const string SELECT_GOODSIMG_BY_GOODSID = ""
+                + "SELECT * "
+                + "FROM T_GOODS_DOLL_LIST "
+                + "WHERE GOODS_ID = {0}  "
+                + "AND IF_FLAG='1'  "
+                + "ORDER BY SORT";
             public const string SELECT_ACTIVECHECKLIST_BY_ACTIVETYPE = ""
                 + "SELECT A.*,C.*,S.STORE_NAME " +
                 "FROM T_BUSS_ACTIVE A,T_BUSS_ACTIVE_CHECK C ,T_BASE_STORE S " +

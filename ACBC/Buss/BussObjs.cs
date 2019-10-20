@@ -335,7 +335,7 @@ namespace ACBC.Buss
 
     #region DaoObjs
 
-    public class Member
+    public class Member 
     {
         public string memberName;
         public string memberId;
