@@ -83,5 +83,6 @@ namespace ACBC.Common
 
         MemberPhoneExistsByOneself = 20001,
         MemberPhoneExistsByOther = 20002,
+        MemberPhoneError = 20003,
     }
 }

@@ -118,6 +118,11 @@ namespace ACBC.Buss
                     throw new ApiException(CodeMessage.MemberPhoneExistsByOther, "MemberPhoneExistsByOther");
                 }
             }
+
+            if (!memberDao.checkSQLMemberPhone(param.userPhone))
+            {
+                throw new ApiException(CodeMessage.MemberPhoneError, "MemberPhoneError");
+            }
             memberDao.addMemberPhone(memberId, param.userPhone);
             return "";
         }

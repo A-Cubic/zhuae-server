@@ -95,6 +95,20 @@ namespace ACBC.Dao
             return memberInfo;
         }
 
+        public bool checkSQLMemberPhone(string phone)
+        {
+            List<GMember> list = new List<GMember>();
+            var gdb = new SqlServerDB();
+            list = gdb.GMember.Where(b => b.ME_MobileNum == phone).ToList();
+            if (list.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         public string checkMemberPhone(string phone)
         {
