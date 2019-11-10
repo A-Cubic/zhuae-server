@@ -106,7 +106,7 @@ namespace ACBC.Buss
             sessionUser.checkPhone = "";
             sessionBag.Name = JsonConvert.SerializeObject(sessionUser);
             SessionContainer.Update(sessionBag.Key, sessionBag, new TimeSpan(Global.SESSION_EXPIRY_H, Global.SESSION_EXPIRY_M, Global.SESSION_EXPIRY_S));
-            string checkMemberId = memberDao.checkMemberPhone(param.userPhone);
+            string checkMemberId = memberDao.checkMemberPhone(param.userPhone, param.shopType);
             if (checkMemberId != "")
             {
                 if (checkMemberId == memberId)
@@ -123,10 +123,45 @@ namespace ACBC.Buss
             {
                 throw new ApiException(CodeMessage.MemberPhoneError, "MemberPhoneError");
             }
-            memberDao.addMemberPhone(memberId, param.userPhone);
+            if (memberDao.addMemberPhone(memberId, param.userPhone, param.shopType))
+            {
+                throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
+            }
             return "";
         }
-        
+
+
+        public object Do_AddLeek(BaseApi baseApi)
+        {
+            MemberParam param = JsonConvert.DeserializeObject<MemberParam>(baseApi.param.ToString());
+            if (param == null)
+            {
+                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
+            }
+            if (param.memberId == null || param.memberId == "")
+            {
+                throw new ApiException(CodeMessage.InterfaceValueError, "InterfaceValueError");
+            }
+
+            MemberDao memberDao = new MemberDao();
+            string memberId = Utils.GetMemberID(baseApi.token);
+
+            if (memberDao.checkMemberLeek(param.memberId, memberId) == "20005")
+            {
+                throw new ApiException(CodeMessage.MemberLeekBindSameExists, "MemberLeekBindSameExists");
+            }
+            else if (memberDao.checkMemberLeek(param.memberId, memberId) == "20006")
+            {
+                throw new ApiException(CodeMessage.MemberLeekBindOtherExists, "MemberLeekBindOtherExists");
+            }
+
+            if (memberDao.addLeek(param.memberId, memberId))
+            {
+                throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
+
+            }
+            return "";
+        }
         public object Do_GetExchangeList(BaseApi baseApi)
         {
             MemberDao memberDao = new MemberDao();
@@ -143,6 +178,48 @@ namespace ACBC.Buss
             List<GRechargeDetail> list = memberDao.getRechargeList(memberId);
             return list;
 
+        }
+
+        public object Do_GetResellerImg(BaseApi baseApi)
+        {
+            MemberDao memberDao = new MemberDao();
+            string memberId = Utils.GetMemberID(baseApi.token);
+            return memberDao.getResellerImg(memberId);
+        }
+        public object Do_GetResellerLeek(BaseApi baseApi)
+        {
+            GetGoodsListParam getGoodsListParam = JsonConvert.DeserializeObject<GetGoodsListParam>(baseApi.param.ToString());
+            if (getGoodsListParam == null)
+            {
+                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
+            }
+
+            string memberId = Utils.GetMemberID(baseApi.token);
+            MemberDao memberDao = new MemberDao();
+            return memberDao.getLeekListByMemberIdAndPageNum(memberId, getGoodsListParam.pageNum);
+
+        }
+        public object Do_GetResellerAccount(BaseApi baseApi)
+        {
+            GetGoodsListParam getGoodsListParam = JsonConvert.DeserializeObject<GetGoodsListParam>(baseApi.param.ToString());
+            if (getGoodsListParam == null)
+            {
+                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
+            }
+
+            string memberId = Utils.GetMemberID(baseApi.token);
+            MemberDao memberDao = new MemberDao();
+            return memberDao.getAccountListByMemberIdAndPageNum(memberId, getGoodsListParam.pageNum);
+
+        }
+
+        public object Do_HandleAccount(BaseApi baseApi)
+        {
+            MemberDao memberDao = new MemberDao();
+
+
+            memberDao.getAccountSelectList();
+            return "";
         }
     }
 }

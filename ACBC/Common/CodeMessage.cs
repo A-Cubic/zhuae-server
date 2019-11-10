@@ -22,7 +22,7 @@ namespace ACBC.Common
         SenparcCode = 1000,
 
         PaymentError = 3000,
-        PaymentTotalPriceZero=3001,
+        PaymentTotalPriceZero = 3001,
         PaymentMsgError = 3002,
 
         InvalidToken = 4000,
@@ -84,5 +84,11 @@ namespace ACBC.Common
         MemberPhoneExistsByOneself = 20001,
         MemberPhoneExistsByOther = 20002,
         MemberPhoneError = 20003,
+        ZEMemberPhoneExists = 20004,
+        MemberLeekBindSameExists = 20005,
+        MemberLeekBindOtherExists = 20006,
+        MemberBindExists = 20007,
+        ACCOUNTExists = 20008,
+        ACCOUNTZEExists = 20009,
     }
 }

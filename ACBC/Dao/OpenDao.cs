@@ -30,6 +30,7 @@ namespace ACBC.Dao
                     memberSex = dt.Rows[0]["MEMBER_SEX"].ToString(),
                     openid = dt.Rows[0]["OPENID"].ToString(),
                     scanCode = "CHECK_" + dt.Rows[0]["SCAN_CODE"].ToString(),
+                    reseller = (dt.Rows[0]["IF_RESELLER"].ToString() == "1"),
                 };
             }
 

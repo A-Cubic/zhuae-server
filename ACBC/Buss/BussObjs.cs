@@ -233,6 +233,7 @@ namespace ACBC.Buss
     public class AddPhoneParam
     {
         public string userPhone;
+        public string shopType;
         public string code;
     }
 
@@ -331,6 +332,10 @@ namespace ACBC.Buss
     {
         public string activeType;
     }
+    public class MemberParam
+    {
+        public string memberId;
+    }
     #endregion
 
     #region DaoObjs
@@ -344,6 +349,7 @@ namespace ACBC.Buss
         public string memberPhone;
         public string memberSex;
         public string scanCode;
+        public bool reseller;
     }
 
     public class StoreUser
@@ -568,6 +574,7 @@ namespace ACBC.Buss
         public int phone = 0;
         public int point = 0;
         public int score = 0;
+        public int price = 0;
     }
 
     public class RemoteStoreMember
@@ -774,6 +781,28 @@ namespace ACBC.Buss
         public string shopImg;
         public string shopAddr;
         public string remark;
+    }
+    public class ResellerAccount
+    {
+        public string acount_date;
+        public string member_id;
+        public string member_name;
+        public string phone;
+        public double acount_price;
+        public double reseller_price;
+        public string createTime;
+    }
+    public class Leek
+    {
+        //public string memberId;
+        //public string leekMemberId;
+        public string leekName;
+        public string createTime;
+    }
+    public class AccountInfo
+    {
+        public string accountDate;
+        public string accountPhones;
     }
     #endregion
 }

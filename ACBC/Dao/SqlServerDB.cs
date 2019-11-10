@@ -32,7 +32,7 @@ namespace ACBC.Dao
     {
         [Key]
         public string ME_ID { set; get; }
-
+        public string ME_Type { set; get; }
         public Int32 ME_Score { set; get; }
         public Int32 ME_Point { set; get; }
         public string ME_MobileNum { set; get; }

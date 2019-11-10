@@ -58,7 +58,8 @@ namespace ACBC.Buss
                         member.memberImg,
                         member.memberPhone,
                         member.memberSex,
-                        member.scanCode
+                        member.scanCode,
+                        member.reseller
                     };
                 }
             }
