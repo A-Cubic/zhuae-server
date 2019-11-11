@@ -386,7 +386,7 @@ namespace ACBC.Dao
         {
             List<Leek> list = new List<Leek>();
             StringBuilder builder = new StringBuilder();
-            builder.AppendFormat(MemberSqls.SELECT_RESELLERLEEK_LIST_BY_MEMBER_ID, memberId, pageNum * 10);
+            builder.AppendFormat(MemberSqls.SELECT_RESELLERLEEK_LIST_BY_MEMBER_ID, memberId, pageNum * 15);
             string sql = builder.ToString();
             DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
             if (dt != null && dt.Rows.Count > 0)
@@ -408,7 +408,7 @@ namespace ACBC.Dao
         {
             List<ResellerAccount> list = new List<ResellerAccount>();
             StringBuilder builder = new StringBuilder();
-            builder.AppendFormat(MemberSqls.SELECT_RESELLERACCOUNT_LIST_BY_MEMBER_ID, memberId, pageNum * 10);
+            builder.AppendFormat(MemberSqls.SELECT_RESELLERACCOUNT_LIST_BY_MEMBER_ID, memberId, pageNum * 15);
             string sql = builder.ToString();
             DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
             if (dt != null && dt.Rows.Count > 0)
@@ -540,13 +540,13 @@ namespace ACBC.Dao
                 + "FROM T_MEMBER_LEEK "
                 + "WHERE MEMBER_ID = {0} "
                 + "ORDER BY ID DESC "
-                + "LIMIT {1},10  ";
+                + "LIMIT {1},15  ";
             public const string SELECT_RESELLERACCOUNT_LIST_BY_MEMBER_ID = ""
                 + "SELECT A.* "
                 + "FROM T_MEMBER_LEEK L ,T_ACCOUNT_LIST A "
                 + "WHERE L.LEEK_MEMBER_ID = A.MEMBER_ID "
                 + "ORDER BY A.ID DESC "
-                + "LIMIT {1},10  ";
+                + "LIMIT {1},15  ";
 
 
             public const string SELECT_APPUSER_LIST_BY_PHONES = ""
