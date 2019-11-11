@@ -543,7 +543,7 @@ namespace ACBC.Dao
                 + "LIMIT {1},10  ";
             public const string SELECT_RESELLERACCOUNT_LIST_BY_MEMBER_ID = ""
                 + "SELECT A.* "
-                + "FROM T_MEMBER_LEEK L ,T_ACOUNT_LIST A "
+                + "FROM T_MEMBER_LEEK L ,T_ACCOUNT_LIST A "
                 + "WHERE L.LEEK_MEMBER_ID = A.MEMBER_ID "
                 + "ORDER BY A.ID DESC "
                 + "LIMIT {1},10  ";
