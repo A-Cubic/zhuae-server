@@ -142,8 +142,8 @@ namespace ACBC.Dao
                     string[] sts = txt.Split("#");
                     if (sts.Length == 2)
                     {
-                        memberInfo.point = Convert.ToInt32(sts[0]);
-                        memberInfo.score = Convert.ToInt32(sts[1]);
+                        int.TryParse(sts[0], out memberInfo.point);
+                        int.TryParse(sts[1], out memberInfo.score);
                     }
                     else
                     {
