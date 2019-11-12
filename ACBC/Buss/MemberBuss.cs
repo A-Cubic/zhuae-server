@@ -123,7 +123,7 @@ namespace ACBC.Buss
             {
                 throw new ApiException(CodeMessage.MemberPhoneError, "MemberPhoneError");
             }
-            if (memberDao.addMemberPhone(memberId, param.userPhone, param.shopType))
+            if (!memberDao.addMemberPhone(memberId, param.userPhone, param.shopType))
             {
                 throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
             }
@@ -155,7 +155,7 @@ namespace ACBC.Buss
                 throw new ApiException(CodeMessage.MemberLeekBindOtherExists, "MemberLeekBindOtherExists");
             }
 
-            if (memberDao.addLeek(param.memberId, memberId))
+            if (!memberDao.addLeek(param.memberId, memberId))
             {
                 throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
 
