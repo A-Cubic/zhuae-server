@@ -118,11 +118,14 @@ namespace ACBC.Buss
                     throw new ApiException(CodeMessage.MemberPhoneExistsByOther, "MemberPhoneExistsByOther");
                 }
             }
-
-            if (!memberDao.checkSQLMemberPhone(param.userPhone))
+            if (param.shopType=="001"|| param.shopType == "1")
             {
-                throw new ApiException(CodeMessage.MemberPhoneError, "MemberPhoneError");
+                if (!memberDao.checkSQLMemberPhone(param.userPhone))
+                {
+                    throw new ApiException(CodeMessage.MemberPhoneError, "MemberPhoneError");
+                }
             }
+            
             if (!memberDao.addMemberPhone(memberId, param.userPhone, param.shopType))
             {
                 throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
