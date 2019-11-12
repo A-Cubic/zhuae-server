@@ -118,7 +118,11 @@ namespace ACBC.Buss
                     throw new ApiException(CodeMessage.MemberPhoneExistsByOther, "MemberPhoneExistsByOther");
                 }
             }
-            if (param.shopType=="001"|| param.shopType == "1")
+            if (param.shopType == "001")
+            {
+                param.shopType = "1";
+            }
+            if (param.shopType == "1")
             {
                 if (!memberDao.checkSQLMemberPhone(param.userPhone))
                 {
