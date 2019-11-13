@@ -546,6 +546,7 @@ namespace ACBC.Dao
                 + "SELECT A.* "
                 + "FROM T_MEMBER_LEEK L ,T_ACCOUNT_LIST A "
                 + "WHERE L.LEEK_MEMBER_ID = A.MEMBER_ID "
+                + "AND L.MEMBER_ID = '{0}' "
                 + "ORDER BY A.ID DESC "
                 + "LIMIT {1},15  ";
 
