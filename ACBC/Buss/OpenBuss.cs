@@ -29,7 +29,7 @@ namespace ACBC.Buss
             var jsonResult = SnsApi.JsCode2Json(Global.APPID, Global.APPSECRET, loginParam.code);
             if (jsonResult.errcode == Senparc.Weixin.ReturnCode.请求成功)
             {
-                AccessTokenContainer.Register(Global.APPID, Global.APPSECRET);
+                AccessTokenContainer.RegisterAsync(Global.APPID, Global.APPSECRET);
                 var sessionBag = SessionContainer.UpdateSession(null, jsonResult.openid, jsonResult.session_key, jsonResult.unionid);
 
                 OpenDao openDao = new OpenDao();
@@ -118,7 +118,7 @@ namespace ACBC.Buss
             var jsonResult = SnsApi.JsCode2Json(Global.STOREAPPID, Global.STOREAPPSECRET, loginParam.code);
             if (jsonResult.errcode == Senparc.Weixin.ReturnCode.请求成功)
             {
-                AccessTokenContainer.Register(Global.STOREAPPID, Global.STOREAPPSECRET);
+                AccessTokenContainer.RegisterAsync(Global.STOREAPPID, Global.STOREAPPSECRET);
                 var sessionBag = SessionContainer.UpdateSession(null, jsonResult.openid, jsonResult.session_key, jsonResult.unionid);
 
                 OpenDao openDao = new OpenDao();

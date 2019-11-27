@@ -234,6 +234,40 @@ namespace ACBC.Common
             }
         }
 
+        /// <summary>
+        /// 小程序MCHID
+        /// </summary>
+        public static string MCHID
+        {
+            get
+            {
+                var MCHID = System.Environment.GetEnvironmentVariable("WxMchId");
+                return MCHID;
+            }
+        }
+        /// <summary>
+        /// 小程序PaymentKey
+        /// </summary>
+        public static string PaymentKey
+        {
+            get
+            {
+                var PaymentKey = System.Environment.GetEnvironmentVariable("WxPaymentKey");
+                return PaymentKey;
+            }
+        }
+        /// <summary>
+        /// 小程序PaymentKey
+        /// </summary>
+        public static string CallBackUrl
+        {
+            get
+            {
+                var CallBackUrl = System.Environment.GetEnvironmentVariable("CallBackUrl");
+                return CallBackUrl;
+            }
+        }
+
 
         #endregion
 

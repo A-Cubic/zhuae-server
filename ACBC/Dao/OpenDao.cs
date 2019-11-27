@@ -118,6 +118,13 @@ namespace ACBC.Dao
             return DatabaseOperationWeb.ExecuteDML(list);
         }
 
+        public void add_log(string logType, string value, string memberId)
+        {
+            StringBuilder builder1 = new StringBuilder();
+            builder1.AppendFormat(OpenSqls.ADD_LOG, logType, memberId, value);
+            string sql1 = builder1.ToString();
+            DatabaseOperationWeb.ExecuteDML(sql1);
+        }
         private class OpenSqls
         {
             public const string SELECT_MEMBER_BY_OPENID = ""
@@ -147,6 +154,9 @@ namespace ACBC.Dao
                 + "FROM T_BUSS_STORE_CODE "
                 + "WHERE STORE_CODE = '{0}' "
                 + "AND STATE > 0";
+            public const string ADD_LOG = ""
+                + "INSERT INTO T_BASE_LOG(LOG_TYPE,MEMBER_ID,LOG_TIME,LOG_VALUE) "
+                + "VALUES('{0}','{1}',NOW(),'{2}')";
         }
     }
 }

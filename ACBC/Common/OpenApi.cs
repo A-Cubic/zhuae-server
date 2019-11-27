@@ -20,6 +20,7 @@ namespace ACBC.Common
         StoreApi,
         ActiveApi,
         HomePageApi,
+        PaymentApi,
     }
 
     public enum CheckType
@@ -236,5 +237,25 @@ namespace ACBC.Common
             return ApiType.HomePageApi;
         }
 
+    }
+    /// <summary>
+    /// 完全开放
+    /// </summary>
+    public class PaymentApi : BaseApi
+    {
+        public override CheckType GetCheckType()
+        {
+            return CheckType.Open;
+        }
+
+        public override InputType GetInputType()
+        {
+            return InputType.Body;
+        }
+
+        public override ApiType GetApiType()
+        {
+            return ApiType.PaymentApi;
+        }
     }
 }

@@ -228,5 +228,67 @@ namespace ACBC.Buss
             memberDao.getAccountSelectList();
             return "";
         }
+        public object Do_AddReseller(BaseApi baseApi)
+        {
+            AddResellerParam param = JsonConvert.DeserializeObject<AddResellerParam>(baseApi.param.ToString());
+            if (param == null)
+            {
+                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
+            }
+            if (param.name == null || param.name == "")
+            {
+                throw new ApiException(CodeMessage.InterfaceValueError, "InterfaceValueError");
+            }
+            if (param.userPhone == null || param.userPhone == "")
+            {
+                throw new ApiException(CodeMessage.InterfaceValueError, "InterfaceValueError");
+            }
+
+            MemberDao memberDao = new MemberDao();
+            string memberId = Utils.GetMemberID(baseApi.token);
+
+            
+            if (!memberDao.addReseller(param.name, param.userPhone, memberId))
+            {
+                throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
+
+            }
+            return "";
+        }
+        public object Do_GetResellerType(BaseApi baseApi)
+        {
+            string memberId = Utils.GetMemberID(baseApi.token);
+            MemberDao memberDao = new MemberDao();
+            return memberDao.getResellerType(memberId);
+        }
+        public object Do_UpdateResellerType(BaseApi baseApi)
+        {
+            ResellerTypeParam param = JsonConvert.DeserializeObject<ResellerTypeParam>(baseApi.param.ToString());
+            if (param == null)
+            {
+                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
+            }
+            if (param.resellerType == null || param.resellerType == "")
+            {
+                throw new ApiException(CodeMessage.InterfaceValueError, "InterfaceValueError");
+            }
+
+            MemberDao memberDao = new MemberDao();
+            string memberId = Utils.GetMemberID(baseApi.token);
+            
+
+            if (!memberDao.updateResellerType(param.resellerType, param.oldResellerType, memberId))
+            {
+                throw new ApiException(CodeMessage.UpdateResellerTypeError, "UpdateResellerTypeError");
+
+            }
+            return "";
+        }
+
+        public object Do_GetResellerGoods(BaseApi baseApi)
+        {
+            MemberDao memberDao = new MemberDao();
+            return memberDao.getResellerGoods();
+        }
     }
 }

@@ -90,5 +90,6 @@ namespace ACBC.Common
         MemberBindExists = 20007,
         ACCOUNTExists = 20008,
         ACCOUNTZEExists = 20009,
+        UpdateResellerTypeError = 20010,
     }
 }

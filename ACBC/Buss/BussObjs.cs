@@ -336,6 +336,21 @@ namespace ACBC.Buss
     {
         public string memberId;
     }
+    public class AddResellerParam
+    {
+        public string name;
+        public string userPhone;
+    }
+    public class ResellerTypeParam
+    {
+        public string resellerType;
+        public string oldResellerType;
+    }
+
+    public class PaymentParam
+    {
+        public string id; //
+    }
     #endregion
 
     #region DaoObjs
@@ -803,6 +818,72 @@ namespace ACBC.Buss
     {
         public string accountDate;
         public string accountPhones;
+    }
+    public class ResellerType
+    {
+        public string resellerType;
+        public bool senior;
+        public bool buyGoods;
+        public bool todayUpdate;
+    }
+    public class ResellerGoods
+    {
+        public string id;
+        public string goodsId;
+        public string barcode;
+        public string goodsName;
+        public string goodsImg;
+        public string goodsPrice;
+        public string goodsNum;
+    }
+
+    public class PaymentResults
+    {
+        public string product;
+        public string appId;
+        public string timeStamp;
+        public string nonceStr;
+        public string package;
+        public string paySign;
+        public string billId;
+    }
+
+    public class PaymentDataResults
+    {
+        public string openId;
+        public string billid;
+        public string billPrice;
+        public string billValue;
+        public string bookingTime;
+        public string bookingState;
+        public string prePayId;
+        public string payNo;
+        public string refundFee;
+        public string refundTime;
+        public string formId;
+    }
+    public class Bill
+    {
+        public string id;
+        public string billId;
+        public string memberId;
+        public string billTime;
+        public string billState;
+        public double billPrice;
+        public string goodsId;
+        public string barcode;
+        public string goodsName;
+        public string goodsImg;
+        public int goods_num;
+        public string buyerName;
+        public string buyerPhone;
+        public string buyerAddr;
+        public string prePayId;
+        public string prePayTime;
+        public string payNo;
+        public string payType;
+        public string payTime;
+        public string formId;
     }
     #endregion
 }

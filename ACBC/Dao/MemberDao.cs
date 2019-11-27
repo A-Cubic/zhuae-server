@@ -1,11 +1,15 @@
 ﻿using ACBC.Buss;
 using ACBC.Common;
 using Com.ACBC.Framework.Database;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -198,7 +202,7 @@ namespace ACBC.Dao
             //List<GMember> list = new List<GMember>();
             //var gdb = new SqlServerDB();
             //list = gdb.GMember.Where(b => b.ME_MobileNum == phone).ToList();
-            List<GMember> list = WSGetMemberInfo("'"+phone+"'");
+            List<GMember> list = WSGetMemberInfo("'" + phone + "'");
             if (list.Count > 0)
             {
                 return true;
@@ -510,6 +514,118 @@ namespace ACBC.Dao
 
         }
 
+        public bool addReseller(string name, string phone, string memberId)
+        {
+            string imgUrl = getQrcode(memberId);
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.UPDATE_MEMBER_RESELLER, name, phone, imgUrl, memberId);
+            string sql = builder.ToString();
+            return DatabaseOperationWeb.ExecuteDML(sql);
+        }
+
+
+        public ResellerType getResellerType(string memberId)
+        {
+            ResellerType resellerType = null;
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.SELECT_MEMBER_BY_MEMBER_ID, memberId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                bool todayUpdate = false;
+                if (dt.Rows[0]["reseller_type"].ToString()!="")
+                {
+                    try
+                    {
+                        todayUpdate = (Convert.ToDateTime(dt.Rows[0]["update_type_lasttime"]).Date==DateTime.Now.Date);
+                    }
+                    catch 
+                    {
+                        
+                    }
+                }
+                resellerType = new ResellerType
+                {
+                    resellerType = dt.Rows[0]["reseller_type"].ToString(),
+                    senior = (dt.Rows[0]["if_senior"].ToString() == "1"),
+                    buyGoods = (dt.Rows[0]["if_buy_goods"].ToString() == "1"),
+                    todayUpdate= todayUpdate,
+                };
+            }
+            return resellerType;
+        }
+
+        public bool updateResellerType(string resellerType, string oldResellerType, string memberId)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.UPDATE_MEMBER_RESELLER_TYPE, resellerType, memberId);
+            string sql = builder.ToString();
+            if(DatabaseOperationWeb.ExecuteDML(sql))
+            {
+                StringBuilder builder1 = new StringBuilder();
+                builder1.AppendFormat(MemberSqls.ADD_LOG, "resellerType", memberId, oldResellerType+"=>"+ resellerType);
+                string sql1 = builder1.ToString();
+                DatabaseOperationWeb.ExecuteDML(sql1);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public List<ResellerGoods> getResellerGoods()
+        {
+            List<ResellerGoods> list = new List<ResellerGoods>();
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.SELECT_RESELLERGOODS_LIST );
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    ResellerGoods resellerGoods = new ResellerGoods
+                    {
+                        id = dt.Rows[i]["id"].ToString(),
+                        goodsId = dt.Rows[i]["goods_id"].ToString(),
+                        barcode = dt.Rows[i]["barcode"].ToString(),
+                        goodsName = dt.Rows[i]["goods_name"].ToString(),
+                        goodsImg = dt.Rows[i]["goods_img"].ToString(),
+                        goodsPrice = dt.Rows[i]["goods_price"].ToString(),
+                        goodsNum = dt.Rows[i]["goods_num"].ToString(),
+                    };
+                    list.Add(resellerGoods);
+                }
+                
+            }
+            return list;
+        }
+
+        public ResellerGoods getResellerGoodsById(string id)
+        {
+            ResellerGoods resellerGoods = null;
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.SELECT_RESELLERGOODS_BY_ID,id);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                resellerGoods = new ResellerGoods
+                {
+                    id = dt.Rows[0]["id"].ToString(),
+                    goodsId = dt.Rows[0]["goods_id"].ToString(),
+                    barcode = dt.Rows[0]["barcode"].ToString(),
+                    goodsName = dt.Rows[0]["goods_name"].ToString(),
+                    goodsImg = dt.Rows[0]["goods_img"].ToString(),
+                    goodsPrice = dt.Rows[0]["goods_price"].ToString(),
+                    goodsNum = dt.Rows[0]["goods_num"].ToString(),
+                };
+            }
+            return resellerGoods;
+        }
+
         private class MemberSqls
         {
             public const string SELECT_PHONE_LIST_BY_MEMBER_ID = ""
@@ -594,6 +710,24 @@ namespace ACBC.Dao
             public const string ADD_ACCOUNT_LOG = ""
                 + "INSERT INTO T_ACCOUNT_LOG(ACCOUNT_COUNT,ACCOUNT_DATE,CREATETIME) "
                 + "VALUES('{0}','{1}',NOW())";
+            public const string UPDATE_MEMBER_RESELLER = ""
+                + "UPDATE T_BASE_MEMBER SET RESELLER_NAME='{0}' ,RESELLER_PHONE='{1}',RESELLER_IMG='{2}',"
+                + "IF_RESELLER='1',RESELLER_TYPE='1' "
+                + "WHERE MEMBER_ID='{3}'";
+            public const string UPDATE_MEMBER_RESELLER_TYPE = ""
+                + "UPDATE T_BASE_MEMBER SET RESELLER_TYPE='{0}' ,update_type_lasttime=NOW() "
+                + "WHERE MEMBER_ID='{1}'";
+            public const string ADD_LOG = ""
+                + "INSERT INTO T_BASE_LOG(LOG_TYPE,MEMBER_ID,LOG_TIME,LOG_VALUE) "
+                + "VALUES('{0}','{1}',NOW(),'{2}')";
+
+            public const string SELECT_RESELLERGOODS_LIST = ""
+                + "SELECT * "
+                + "FROM T_GOODS_RESELLER ";
+            public const string SELECT_RESELLERGOODS_BY_ID = ""
+                + "SELECT * "
+                + "FROM T_GOODS_RESELLER " 
+                + "WHERE ID = {0}";
         }
 
         /// <summary>
@@ -714,6 +848,100 @@ namespace ACBC.Dao
             }
 
             return list;
+        }
+        public string getQrcode(string memberId)
+        {
+            try
+            {
+                string token = Request_Url(Global.APPID, Global.APPSECRET);
+                Demo demo = new Demo
+                {
+                    path = "pages/resellerBack/resellerBack?memberId=" + memberId,
+                    auto_color = false,
+                    width = 600,
+                    is_hyaline = false,
+                };
+
+                string body = JsonConvert.SerializeObject(demo);
+                byte[] byte1 = PostMoths("https://api.weixin.qq.com/wxa/getwxacode?access_token=" + token, body);
+                FileManager fileManager = new FileManager();
+                fileManager.saveImgByByte(byte1, memberId + ".jpg");
+                OssManager.UploadFileToOSS(memberId + ".jpg", Global.OssDir, memberId + ".jpg");
+                return Global.OssUrl + Global.OssDir + memberId + ".jpg";
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
+        }
+        //获取AccessToken
+        public string Request_Url(string _appid, string _appsecret)
+        {
+            // 设置参数
+            string _url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + _appid + "&secret=" + _appsecret;
+            string method = "GET";
+            HttpWebRequest request = WebRequest.Create(_url) as HttpWebRequest;
+            CookieContainer cookieContainer = new CookieContainer();
+            request.CookieContainer = cookieContainer;
+            request.AllowAutoRedirect = true;
+            request.Method = method;
+            request.ContentType = "text/html";
+            request.Headers.Add("charset", "utf-8");
+
+            //发送请求并获取相应回应数据
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            //直到request.GetResponse()程序才开始向目标网页发送Post请求
+            Stream responseStream = response.GetResponseStream();
+            StreamReader sr = new StreamReader(responseStream, Encoding.UTF8);
+            //返回结果网页（html）代码
+            string content = sr.ReadToEnd();
+            //由于微信服务器返回的JSON串中包含了很多信息，我们只需要将AccessToken获取就可以了，需要将JSON拆分
+            string[] str = content.Split('"');
+            content = str[3];
+            //db.StringSet("WXToken" + _appid, content, new TimeSpan(1, 0, 0));
+            return content;
+        }
+        public byte[] PostMoths(string _url, string _jso)
+        {
+            string strURL = _url;
+            System.Net.HttpWebRequest request;
+            request = (System.Net.HttpWebRequest)WebRequest.Create(strURL);
+            request.Method = "POST";
+            request.ContentType = "application/json;charset=UTF-8";
+
+            //string paraUrlCoded = param;
+            byte[] payload;
+            //payload = System.Text.Encoding.UTF8.GetBytes(paraUrlCoded);
+            payload = System.Text.Encoding.UTF8.GetBytes(_jso);
+            request.ContentLength = payload.Length;
+            Stream writer = request.GetRequestStream();
+            writer.Write(payload, 0, payload.Length);
+            writer.Close();
+            System.Net.HttpWebResponse response;
+            response = (System.Net.HttpWebResponse)request.GetResponse();
+            System.IO.Stream s;
+            s = response.GetResponseStream();
+            byte[] tt = StreamToBytes(s);
+            return tt;
+        }
+        ///将数据流转为byte[]
+        public static byte[] StreamToBytes(Stream stream)
+        {
+            List<byte> bytes = new List<byte>();
+            int temp = stream.ReadByte();
+            while (temp != -1)
+            {
+                bytes.Add((byte)temp);
+                temp = stream.ReadByte();
+            }
+            return bytes.ToArray();
+        }
+        public class Demo
+        {
+            public string path;
+            public bool auto_color;
+            public int width;
+            public bool is_hyaline;
         }
     }
 }
