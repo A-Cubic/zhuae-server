@@ -350,6 +350,9 @@ namespace ACBC.Buss
     public class PaymentParam
     {
         public string id; //
+        public string buyerName; //
+        public string buyerAddr; //
+        public string buyerPhone; //
     }
     #endregion
 

@@ -50,7 +50,7 @@ namespace ACBC.Buss
             OpenDao openDao = new OpenDao();
             PaymentDao paymentDao = new PaymentDao();
             MemberDao memberDao = new MemberDao();
-            Bill bill =paymentDao.AddBill(memberId,memberDao.getResellerGoodsById(paymentParam.id));
+            Bill bill =paymentDao.AddBill(memberId,memberDao.getResellerGoodsById(paymentParam.id), paymentParam);
             int totalPrice = Convert.ToInt32(bill.billPrice * 100);
             if (totalPrice <= 0)
             {
