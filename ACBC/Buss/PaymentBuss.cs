@@ -81,7 +81,7 @@ namespace ACBC.Buss
                 {
                     openDao.add_log("pay", result.ResultXml, "");
                 }
-                openDao.add_log("pay_notify", xmlDataInfo.NotifyUrl+"#"+ tenPayV3Info.TenPayV3Notify, "");
+                //openDao.add_log("pay_notify", xmlDataInfo.NotifyUrl+"#"+ tenPayV3Info.TenPayV3Notify, "");
                 pDao.writePrePayId(bill.billId, result.prepay_id);
                 var package = string.Format("prepay_id={0}", result.prepay_id);
                 var paySign = TenPayV3.GetJsPaySign(tenPayV3Info.AppId, timeStamp, nonceStr, package, tenPayV3Info.Key);

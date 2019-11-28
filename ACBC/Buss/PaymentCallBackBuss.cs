@@ -31,11 +31,11 @@ namespace ACBC.Buss
         {
             OpenDao openDao = new OpenDao();
             string return_code = "SUCCESS";
-            string return_msg = "OK";
+            string return_msg1 = "OK";
             try
             {
                 return_code = resHandler.GetParameter("return_code");
-                return_msg = resHandler.GetParameter("return_msg");
+                string return_msg = resHandler.GetParameter("return_msg");
                 string openid = resHandler.GetParameter("openid");
                 string total_fee = resHandler.GetParameter("total_fee");
                 string time_end = resHandler.GetParameter("time_end");
@@ -72,19 +72,19 @@ namespace ACBC.Buss
                 else
                 {
                     return_code = "FAIL";
-                    return_msg = "不是从微信发过来";
+                    return_msg1 = "不是从微信发过来";
 
                     //openDao.writeLog(Global.POSCODE, openid, "payCallBack", return_msg + "#" + out_trade_no + "#" + transaction_id + "#" + total_fee + "#" + time_end);
                 }
-                return string.Format(@"<xml><return_code><![CDATA[{0}]]></return_code><return_msg><![CDATA[{1}]]></return_msg></xml>", return_code, return_msg);
+                return string.Format(@"<xml><return_code><![CDATA[{0}]]></return_code><return_msg><![CDATA[{1}]]></return_msg></xml>", return_code, return_msg1);
 
             }
             catch (Exception ex)
             {
                 return_code = "FAIL";
-                return_msg = ex.ToString();
+                return_msg1 = ex.ToString();
                 //openDao.writeLog(Global.POSCODE, "", "payCallBack", return_msg);
-                return string.Format(@"<xml><return_code><![CDATA[{0}]]></return_code><return_msg><![CDATA[{1}]]></return_msg></xml>", return_code, return_msg);
+                return string.Format(@"<xml><return_code><![CDATA[{0}]]></return_code><return_msg><![CDATA[{1}]]></return_msg></xml>", return_code, return_msg1);
             }
         }
         /// <summary>

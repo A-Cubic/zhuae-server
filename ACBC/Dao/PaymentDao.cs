@@ -42,7 +42,7 @@ namespace ACBC.Dao
 
                 bill = new Bill
                 {
-                    id = dt.Rows[0]["openId"].ToString(),
+                    id = dt.Rows[0]["id"].ToString(),
                     billId = dt.Rows[0]["bill_id"].ToString(),
                     memberId = dt.Rows[0]["member_id"].ToString(),
                     billTime = dt.Rows[0]["bill_time"].ToString(),
