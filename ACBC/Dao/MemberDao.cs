@@ -78,7 +78,7 @@ namespace ACBC.Dao
                                 {
                                     ME_ID = dt2.Rows[i]["USER_NICKNAME"].ToString(),
                                     ME_Type = "APP",
-                                    ME_Score = Convert.ToInt32(dt2.Rows[i]["GIFT_BALANCE"]),
+                                    ME_Score = Convert.ToInt32(dt2.Rows[i]["LAVEPOINT"]),
                                     ME_Point = Convert.ToInt32(dt2.Rows[i]["TRUE_BALANCE"]),
                                     ME_MobileNum = dt2.Rows[i]["CHAT_USER_ID"].ToString(),
                                 };
@@ -668,12 +668,12 @@ namespace ACBC.Dao
 
 
             public const string SELECT_APPUSER_LIST_BY_PHONES = ""
-                + "SELECT F.TRUE_BALANCE,F.GIFT_BALANCE, U.USER_NICKNAME,U.CHAT_USER_ID  " +
+                + "SELECT F.TRUE_BALANCE,F.LAVEPOINT, U.USER_NICKNAME,U.CHAT_USER_ID  " +
                 "FROM F_BALANCE F,U_USER U " +
                 "WHERE F.USER_ID = U.USER_ID " +
                   "AND U.CHAT_USER_ID IN ({0})";
             public const string SELECT_APPUSER_POINT_LIST_BY_PHONES = ""
-                + "SELECT SUM(F.TRUE_BALANCE) POINT,SUM(F.GIFT_BALANCE) SCORE  " +
+                + "SELECT SUM(F.TRUE_BALANCE) POINT,SUM(F.LAVEPOINT) SCORE  " +
                 "FROM F_BALANCE F,U_USER U " +
                 "WHERE F.USER_ID = U.USER_ID " +
                   "AND U.CHAT_USER_ID IN ({0})";
