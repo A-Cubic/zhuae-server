@@ -9,7 +9,8 @@ local_path=`echo ${local_path/jenkins_home/"docker/jenkins"}`
 echo "$local_path"
 REAL_PATH="$local_path"
 echo "$REAL_PATH"
-docker run --rm -v "$REAL_PATH":/app -w /app mcr.microsoft.com/dotnet/core/sdk:2.1 dotnet restore && dotnet publish -c Release -o ./obj/Docker/publish
+docker run --rm -v "$REAL_PATH":/app -w /app mcr.microsoft.com/dotnet/core/sdk:2.1 dotnet restore
+docker run --rm -v "$REAL_PATH":/app -w /app mcr.microsoft.com/dotnet/core/sdk:2.1 dotnet publish -c Release -o ./obj/Docker/publish
 docker build -t "$REGISTRY_URL"/"$REGISTRY_IMAGE" .
 docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" "$REGISTRY_URL" && docker push "$REGISTRY_URL"/"$REGISTRY_IMAGE"'''
       }
