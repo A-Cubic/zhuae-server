@@ -1,18 +1,28 @@
 pipeline {
-  agent {
-    docker {
-      image 'mcr.microsoft.com/dotnet/core/sdk:2.1'
-      args '--rm -v "$PWD":/src -w /src'
-    }
-
-  }
+  agent any
   stages {
-    stage('Build') {
-      agent any
+    stage('build') {
       steps {
-        sh 'ls'
+        sh '''
+local_path=`echo ${PWD/var/home}`
+local_path=`echo ${local_path/jenkins_home/"docker/jenkins"}`
+echo "$local_path"
+REAL_PATH="$local_path"
+echo "$REAL_PATH"
+docker run --rm -v "$REAL_PATH":/app -v -w /app mcr.microsoft.com/dotnet/core/sdk:2.1 dotnet restore && dotnet publish -c Release -o ./obj/Docker/publish
+cd target
+cp ../Dockerfile . 
+docker build -t "$REGISTRY_URL"/"$REGISTRY_IMAGE" .
+docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" "$REGISTRY_URL" && docker push "$REGISTRY_URL"/"$REGISTRY_IMAGE"'''
       }
     }
 
+  }
+  environment {
+    REGISTRY_URL = 'registry.cn-qingdao.aliyuncs.com'
+    REGISTRY_IMAGE = 'a-cubic/zhuae-server'
+    DOCKER_USERNAME_USR = 'credentials(\'Docker_Push\')'
+    DOCKER_PASSWORD_PSW = 'credentials(\'Docker_Push\')'
+    CACHE = 'zhuae-server'
   }
 }
