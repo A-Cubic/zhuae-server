@@ -888,5 +888,16 @@ namespace ACBC.Buss
         public string payTime;
         public string formId;
     }
+    public class LeekNum
+    {
+        public string leekTotal;
+        public string leekToday;
+        public string leekActive;
+    }
+    public class ResellerTotal
+    {
+        public string total;
+        public string monthTotal;
+    }
     #endregion
 }

@@ -290,5 +290,20 @@ namespace ACBC.Buss
             MemberDao memberDao = new MemberDao();
             return memberDao.getResellerGoods();
         }
+
+        public object Do_GetLeekNum(BaseApi baseApi)
+        {
+            MemberDao memberDao = new MemberDao();
+            string memberId = Utils.GetMemberID(baseApi.token);
+            return memberDao.getLeekNum(memberId);
+
+        }
+        public object Do_GetResellerTotal(BaseApi baseApi)
+        {
+            MemberDao memberDao = new MemberDao();
+            string memberId = Utils.GetMemberID(baseApi.token);
+            return memberDao.getResellerTotal(memberId);
+
+        }
     }
 }

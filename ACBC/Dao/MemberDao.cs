@@ -626,6 +626,80 @@ namespace ACBC.Dao
             return resellerGoods;
         }
 
+        public LeekNum getLeekNum(string memberId)
+        {
+            LeekNum leekNum = null;
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.SELECT_LEEKTOTAL_BY_MEMBERID, memberId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                if (Convert.ToInt32( dt.Rows[0][0])>0)
+                {
+                    string leekToday = "0", leekActive = "0";
+
+                    StringBuilder builder1 = new StringBuilder();
+                    builder1.AppendFormat(MemberSqls.SELECT_LEEKTODAY_BY_MEMBERID, memberId);
+                    string sql1 = builder1.ToString();
+                    DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(sql1, "T").Tables[0];
+                    if (dt1 != null && dt1.Rows.Count > 0)
+                    {
+                        leekToday = dt1.Rows[0][0].ToString();
+                    }
+
+                    StringBuilder builder2 = new StringBuilder();
+                    builder2.AppendFormat(MemberSqls.SELECT_LEEKACTIVE_BY_MEMBERID, memberId);
+                    string sql2 = builder2.ToString();
+                    DataTable dt2 = DatabaseOperationWeb.ExecuteSelectDS(sql2, "T").Tables[0];
+                    if (dt2 != null && dt2.Rows.Count > 0)
+                    {
+                        leekActive = dt2.Rows.Count.ToString();
+                    }
+                    leekNum = new LeekNum
+                    {
+                        leekTotal = dt.Rows[0][0].ToString(),
+                        leekToday = leekToday,
+                        leekActive = leekActive,
+                    };
+                }
+                
+            }
+            return leekNum;
+        }
+
+        public ResellerTotal getResellerTotal(string memberId)
+        {
+            ResellerTotal resellerTotal = null;
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.SELECT_RESELLERTOTAL_BY_MEMBERID, memberId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                if (Convert.ToInt32(dt.Rows[0][0]) > 0)
+                {
+                    string monthTotal = "0";
+
+                    StringBuilder builder1 = new StringBuilder();
+                    builder1.AppendFormat(MemberSqls.SELECT_RESELLERMONTHTOTAL_BY_MEMBERID, memberId);
+                    string sql1 = builder1.ToString();
+                    DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(sql1, "T").Tables[0];
+                    if (dt1 != null && dt1.Rows.Count > 0)
+                    {
+                        monthTotal = dt1.Rows[0][0].ToString();
+                    }
+                    resellerTotal = new ResellerTotal
+                    {
+                        total = dt.Rows[0][0].ToString(),
+                        monthTotal = monthTotal,
+                    };
+                }
+
+            }
+            return resellerTotal;
+        }
+
         private class MemberSqls
         {
             public const string SELECT_PHONE_LIST_BY_MEMBER_ID = ""
@@ -726,10 +800,35 @@ namespace ACBC.Dao
                 + "FROM T_GOODS_RESELLER ";
             public const string SELECT_RESELLERGOODS_BY_ID = ""
                 + "SELECT * "
-                + "FROM T_GOODS_RESELLER " 
+                + "FROM T_GOODS_RESELLER "
                 + "WHERE ID = {0}";
+            public const string SELECT_LEEKTOTAL_BY_MEMBERID = ""
+                + "SELECT COUNT(*) " +
+                "FROM T_MEMBER_LEEK T " +
+                "WHERE T.MEMBER_ID = '{0}'";
+            public const string SELECT_LEEKTODAY_BY_MEMBERID = ""
+                + "SELECT COUNT(*) FROM T_MEMBER_LEEK T " +
+                "WHERE T.MEMBER_ID = '{0}' " +
+                "AND DATE_FORMAT(CREATETIME,'%Y-%m-%d')  = DATE_FORMAT(NOW(),'%Y-%m-%d')";
+            public const string SELECT_LEEKACTIVE_BY_MEMBERID = ""
+                + "SELECT  A.MEMBER_ID,COUNT(*) " +
+                "FROM T_MEMBER_LEEK T,T_ACCOUNT_LIST A " +
+                "WHERE A.MEMBER_ID = T.LEEK_MEMBER_ID " +
+                "AND T.MEMBER_ID = '{0}'  " +
+                "GROUP BY A.MEMBER_ID";
+            public const string SELECT_RESELLERTOTAL_BY_MEMBERID = ""
+                + "SELECT  SUM(A.RESELLER_PRICE) " +
+                "FROM T_MEMBER_LEEK T,T_ACCOUNT_LIST A " +
+                "WHERE A.MEMBER_ID = T.LEEK_MEMBER_ID " +
+                "AND T.MEMBER_ID = '{0}'";
+            public const string SELECT_RESELLERMONTHTOTAL_BY_MEMBERID = ""
+                + "SELECT  SUM(A.RESELLER_PRICE) " +
+                "FROM T_MEMBER_LEEK T,T_ACCOUNT_LIST A " +
+                "WHERE A.MEMBER_ID = T.LEEK_MEMBER_ID " +
+                "AND T.MEMBER_ID = '{0}' " +
+                "AND DATE_FORMAT(A.ACOUNT_DATE,'%Y-%m')  = DATE_FORMAT(NOW(),'%Y-%m')";
         }
-
+        
         /// <summary>
         /// 获取点数
         /// </summary>
