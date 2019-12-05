@@ -670,7 +670,11 @@ namespace ACBC.Dao
 
         public ResellerTotal getResellerTotal(string memberId)
         {
-            ResellerTotal resellerTotal = null;
+            ResellerTotal resellerTotal = new ResellerTotal
+            {
+                total = "0",
+                monthTotal ="0",
+            };
             StringBuilder builder = new StringBuilder();
             builder.AppendFormat(MemberSqls.SELECT_RESELLERTOTAL_BY_MEMBERID, memberId);
             string sql = builder.ToString();
@@ -679,7 +683,7 @@ namespace ACBC.Dao
             {
                 if (Convert.ToInt32(dt.Rows[0][0]) > 0)
                 {
-                    string monthTotal = "0";
+                    resellerTotal.total = dt.Rows[0][0].ToString();
 
                     StringBuilder builder1 = new StringBuilder();
                     builder1.AppendFormat(MemberSqls.SELECT_RESELLERMONTHTOTAL_BY_MEMBERID, memberId);
@@ -687,15 +691,9 @@ namespace ACBC.Dao
                     DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(sql1, "T").Tables[0];
                     if (dt1 != null && dt1.Rows.Count > 0)
                     {
-                        monthTotal = dt1.Rows[0][0].ToString();
+                        resellerTotal.monthTotal = dt1.Rows[0][0].ToString();
                     }
-                    resellerTotal = new ResellerTotal
-                    {
-                        total = dt.Rows[0][0].ToString(),
-                        monthTotal = monthTotal,
-                    };
                 }
-
             }
             return resellerTotal;
         }
@@ -817,12 +815,12 @@ namespace ACBC.Dao
                 "AND T.MEMBER_ID = '{0}'  " +
                 "GROUP BY A.MEMBER_ID";
             public const string SELECT_RESELLERTOTAL_BY_MEMBERID = ""
-                + "SELECT  SUM(A.RESELLER_PRICE) " +
+                + "SELECT  IFNULL(SUM(IFNULL(A.RESELLER_PRICE,0)),0) " +
                 "FROM T_MEMBER_LEEK T,T_ACCOUNT_LIST A " +
                 "WHERE A.MEMBER_ID = T.LEEK_MEMBER_ID " +
                 "AND T.MEMBER_ID = '{0}'";
             public const string SELECT_RESELLERMONTHTOTAL_BY_MEMBERID = ""
-                + "SELECT  SUM(A.RESELLER_PRICE) " +
+                + "SELECT  IFNULL(SUM(IFNULL(A.RESELLER_PRICE,0)),0) " +
                 "FROM T_MEMBER_LEEK T,T_ACCOUNT_LIST A " +
                 "WHERE A.MEMBER_ID = T.LEEK_MEMBER_ID " +
                 "AND T.MEMBER_ID = '{0}' " +
