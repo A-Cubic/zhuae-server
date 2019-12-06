@@ -808,6 +808,8 @@ namespace ACBC.Buss
         public string phone;
         public double acount_price;
         public double reseller_price;
+        public string reseller_type;
+        public string state;
         public string createTime;
     }
     public class Leek
@@ -838,6 +840,7 @@ namespace ACBC.Buss
         public string goodsImg;
         public string goodsPrice;
         public string goodsNum;
+        public string goodsType;
     }
 
     public class PaymentResults
@@ -898,6 +901,7 @@ namespace ACBC.Buss
     {
         public string total;
         public string monthTotal;
+        public string incomeTotal;
     }
     #endregion
 }

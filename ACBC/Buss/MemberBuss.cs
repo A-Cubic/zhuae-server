@@ -223,8 +223,6 @@ namespace ACBC.Buss
         public object Do_HandleAccount(BaseApi baseApi)
         {
             MemberDao memberDao = new MemberDao();
-
-
             memberDao.getAccountSelectList();
             return "";
         }
@@ -246,8 +244,8 @@ namespace ACBC.Buss
 
             MemberDao memberDao = new MemberDao();
             string memberId = Utils.GetMemberID(baseApi.token);
+            memberId = "1035";
 
-            
             if (!memberDao.addReseller(param.name, param.userPhone, memberId))
             {
                 throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
@@ -303,6 +301,13 @@ namespace ACBC.Buss
             MemberDao memberDao = new MemberDao();
             string memberId = Utils.GetMemberID(baseApi.token);
             return memberDao.getResellerTotal(memberId);
+
+        }
+        public object Do_GetResellerGoodsBill(BaseApi baseApi)
+        {
+            MemberDao memberDao = new MemberDao();
+            string memberId = Utils.GetMemberID(baseApi.token);
+            return memberDao.getResellerGoodsBill(memberId);
 
         }
     }

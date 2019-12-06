@@ -339,6 +339,56 @@ namespace ACBC.Common
                 return ossDir;
             }
         }
+
+        #endregion
+        #region 礼余相关
+
+        /// <summary>
+        /// AccessId
+        /// </summary>
+        public static string LYPostUrl
+        {
+            get
+            {
+                var LYPostUrl = System.Environment.GetEnvironmentVariable("LYPostUrl");
+                return LYPostUrl;
+            }
+        }
+        /// <summary>
+        /// AccessKey
+        /// </summary>
+        public static string LYAppId
+        {
+            get
+            {
+                var LYAppId = System.Environment.GetEnvironmentVariable("LYAppId");
+                return LYAppId;
+            }
+        }
+        /// <summary>
+        /// OssHttp
+        /// </summary>
+        public static string LYAppSecret
+        {
+            get
+            {
+                var LYAppSecret = System.Environment.GetEnvironmentVariable("LYAppSecret");
+                return LYAppSecret;
+            }
+        }
+        /// <summary>
+        /// OssBucket
+        /// </summary>
+        public static string LYPlaceHold
+        {
+            get
+            {
+                var LYPlaceHold = System.Environment.GetEnvironmentVariable("LYPlaceHold");
+                return LYPlaceHold;
+            }
+        }
+
+        #endregion
     }
-    #endregion
+
 }

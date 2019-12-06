@@ -10,8 +10,10 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.ServiceModel;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ACBC.Dao
@@ -420,6 +422,20 @@ namespace ACBC.Dao
             {
                 foreach (DataRow dr in dt.Rows)
                 {
+                    string rType = "游戏币";
+                    if (dr["reseller_type"].ToString() == "2")
+                    {
+                        rType = "心值";
+                    }
+                    else if (dr["reseller_type"].ToString() == "3")
+                    {
+                        rType = "钱";
+                    }
+                    string state = "未结算";
+                    if (dr["state"].ToString() == "1")
+                    {
+                        state = "已结算";
+                    }
                     ResellerAccount resellerAccount = new ResellerAccount
                     {
                         acount_date = dr["acount_date"].ToString().Substring(0, 10),
@@ -428,6 +444,8 @@ namespace ACBC.Dao
                         phone = dr["phone"].ToString(),
                         acount_price = Convert.ToDouble(dr["acount_price"]),
                         reseller_price = Convert.ToDouble(dr["reseller_price"]),
+                        reseller_type = rType,
+                        state = state,
                         createTime = dr["createTime"].ToString(),
                     };
                     list.Add(resellerAccount);
@@ -435,6 +453,80 @@ namespace ACBC.Dao
             }
 
             return list;
+        }
+        public void HandleAccountPhone(DateTime dateTime)
+        {
+            ArrayList al = new ArrayList();
+            StringBuilder builder1 = new StringBuilder();
+            builder1.AppendFormat(MemberSqls.SELECT_LEEK_PHONE_BY_DATE_FLAG, dateTime.ToString("yyyy-MM-dd"));
+            string sql1 = builder1.ToString();
+            DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(sql1, "T").Tables[0];
+            if (dt1 != null && dt1.Rows.Count > 0)
+            {
+                string phone = "";
+                foreach (DataRow dr in dt1.Rows)
+                {
+                    if (phone == "")
+                    {
+                        phone = "'" + dr["phone"].ToString() + "'";
+                    }
+                    else
+                    {
+                        phone += ",'" + dr["phone"].ToString() + "'";
+                    }
+                }
+                if (phone!="")
+                {
+                    try
+                    {
+                        DatabaseOperationWeb.TYPE = new DBManagerZE();
+                        StringBuilder builder2 = new StringBuilder();
+                        builder2.AppendFormat(MemberSqls.SELECT_RECHARGE_LIST_BY_PHONES_3MONTHAGO, 
+                            dateTime.AddMonths(-3).ToString("yyyy-MM-dd"), dateTime.AddDays(-1).ToString("yyyy-MM-dd"), phone);
+                        string sql2 = builder2.ToString();
+                        DataTable dt2 = DatabaseOperationWeb.ExecuteSelectDS(sql2, "T").Tables[0];
+                        if (dt2 != null && dt2.Rows.Count > 0)
+                        {
+                            string ids = "";
+                            foreach (DataRow dr2 in dt2.Rows)
+                            {
+                                DataRow[] drs = dt1.Select("phone='" + dr2["chat_user_id"].ToString() + "'");
+                                if (drs.Length>0)
+                                {
+                                    if (ids == "")
+                                    {
+                                        ids = "'" + drs[0]["PID"].ToString() + "'";
+                                    }
+                                    else
+                                    {
+                                        ids += ",'" + drs[0]["PID"].ToString() + "'";
+                                    }
+                                }
+                               
+                            }
+                            if (ids != "")
+                            {
+                                StringBuilder builder3 = new StringBuilder();
+                                builder3.AppendFormat(MemberSqls.UPDATE_MEMBER_LEEK_BY_PHONE, ids);
+                                string sql3 = builder3.ToString();
+                                al.Add(sql3);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ApiException(CodeMessage.ACCOUNTZEExists, "ACCOUNTZEExists");
+                    }
+                    finally
+                    {
+                        DatabaseOperationWeb.TYPE = new DBManager();
+                    }
+                }
+            }
+            if (al.Count>0)
+            {
+                DatabaseOperationWeb.ExecuteDML(al);
+            }
         }
         public void getAccountSelectList()
         {
@@ -448,6 +540,7 @@ namespace ACBC.Dao
                 DateTime maxDate = Convert.ToDateTime(dt.Rows[0][0]).AddDays(1);
                 for (DateTime i = maxDate; i < DateTime.Now; i = i.AddDays(1))
                 {
+                    HandleAccountPhone(i);
                     ArrayList al = new ArrayList();
                     string dateStr = i.ToString("yyyy-MM-dd");
                     StringBuilder builder1 = new StringBuilder();
@@ -482,16 +575,17 @@ namespace ACBC.Dao
                                     DataRow[] drs = dt1.Select("phone='" + dr2["chat_user_id"].ToString() + "'");
                                     if (drs.Length > 0)
                                     {
-                                        double price = Convert.ToDouble(dr2["ALLREC_MONEY"]) * proportion;
+                                        double pro = proportion;
+                                        double.TryParse(drs[0]["proportion"].ToString(), out pro);
+                                        double price = Convert.ToDouble(dr2["ALLREC_MONEY"]) * pro;
                                         StringBuilder builder3 = new StringBuilder();
                                         builder3.AppendFormat(MemberSqls.ADD_ACCOUNT, dateStr, drs[0]["LEEK_MEMBER_ID"].ToString(),
                                             drs[0]["LEEK_NAME"].ToString(), drs[0]["PHONE"].ToString(),
-                                            Convert.ToDouble(dr2["ALLREC_MONEY"]), price.ToString());
+                                            Convert.ToDouble(dr2["ALLREC_MONEY"]), price.ToString(),
+                                            drs[0]["MEMBER_ID"].ToString(), drs[0]["RESELLER_TYPE"].ToString());
                                         string sql3 = builder3.ToString();
                                         al.Add(sql3);
                                     }
-
-
                                 }
                             }
                         }
@@ -621,6 +715,7 @@ namespace ACBC.Dao
                     goodsImg = dt.Rows[0]["goods_img"].ToString(),
                     goodsPrice = dt.Rows[0]["goods_price"].ToString(),
                     goodsNum = dt.Rows[0]["goods_num"].ToString(),
+                    goodsType = dt.Rows[0]["goods_type"].ToString(),
                 };
             }
             return resellerGoods;
@@ -674,6 +769,7 @@ namespace ACBC.Dao
             {
                 total = "0",
                 monthTotal ="0",
+                incomeTotal="0",
             };
             StringBuilder builder = new StringBuilder();
             builder.AppendFormat(MemberSqls.SELECT_RESELLERTOTAL_BY_MEMBERID, memberId);
@@ -693,11 +789,61 @@ namespace ACBC.Dao
                     {
                         resellerTotal.monthTotal = dt1.Rows[0][0].ToString();
                     }
+
+                    StringBuilder builder2= new StringBuilder();
+                    builder2.AppendFormat(MemberSqls.SELECT_INCOME_RESELLERTOTAL_BY_MEMBERID, memberId);
+                    string sql2 = builder2.ToString();
+                    DataTable dt2 = DatabaseOperationWeb.ExecuteSelectDS(sql2, "T").Tables[0];
+                    if (dt2 != null && dt2.Rows.Count > 0)
+                    {
+                        resellerTotal.incomeTotal = dt2.Rows[0][0].ToString();
+                    }
+                    
                 }
             }
             return resellerTotal;
         }
 
+        public string getResellerGoodsBill(string memberId)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.SELECT_MEMBER_BY_MEMBER_ID, memberId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                CommitBy3rdUserParam commit = new CommitBy3rdUserParam
+                {
+                    phone = dt.Rows[0]["reseller_phone"].ToString(),
+                    avatarUrl = dt.Rows[0]["member_img"].ToString(),
+                    gender = dt.Rows[0]["member_sex"].ToString(),
+                    nickName = dt.Rows[0]["member_name"].ToString(),
+                };
+                StringBuilder builder1 = new StringBuilder();
+                builder1.AppendFormat(MemberSqls.SELECT_BILL_BY_MEMBERID, memberId);
+                string sql1 = builder1.ToString();
+                DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(sql1, "T").Tables[0];
+                if (dt1 != null && dt1.Rows.Count > 0)
+                {
+                    commit.preOrderId = dt1.Rows[0]["bill_id"].ToString();
+                    commit.goodsId = dt1.Rows[0]["goods_id"].ToString();
+                    commit.state = dt1.Rows[0]["goods_type"].ToString();
+                    commit.addr = dt1.Rows[0]["buyer_addr"].ToString();
+                }
+
+                string st = getRemoteParam(commit, "CommitBy3rdUser", "5");
+                string result = Utils.PostHttp(Global.LYPostUrl, st, "application/json");
+                ReturnItem ri = JsonConvert.DeserializeObject<ReturnItem>(result);
+                if (ri.success)
+                {
+                    if (ri.data != null)
+                    {
+                        return ri.data;
+                    }
+                }
+            }
+            return "";
+        }
         private class MemberSqls
         {
             public const string SELECT_PHONE_LIST_BY_MEMBER_ID = ""
@@ -727,14 +873,13 @@ namespace ACBC.Dao
             public const string SELECT_RESELLERLEEK_LIST_BY_MEMBER_ID = ""
                 + "SELECT * "
                 + "FROM T_MEMBER_LEEK "
-                + "WHERE MEMBER_ID = {0} "
+                + "WHERE MEMBER_ID = {0} AND FLAG='1' "
                 + "ORDER BY ID DESC "
                 + "LIMIT {1},15  ";
             public const string SELECT_RESELLERACCOUNT_LIST_BY_MEMBER_ID = ""
                 + "SELECT A.* "
-                + "FROM T_MEMBER_LEEK L ,T_ACCOUNT_LIST A "
-                + "WHERE L.LEEK_MEMBER_ID = A.MEMBER_ID "
-                + "AND L.MEMBER_ID = '{0}' "
+                + "FROM T_ACCOUNT_LIST A "
+                + "WHERE  RESELLER_MEMBER_ID = '{0}'  "
                 + "ORDER BY A.ID DESC "
                 + "LIMIT {1},15  ";
 
@@ -753,18 +898,36 @@ namespace ACBC.Dao
             public const string SELECT_MEMBERLEEK_BY_LEEKMEMBER_ID = ""
                 + "SELECT * "
                 + "FROM T_MEMBER_LEEK "
-                + "WHERE LEEK_MEMBER_ID = {0} ";
+                + "WHERE LEEK_MEMBER_ID = {0} " 
+                + "AND FLAG='1' ";
             public const string SELECT_MAX_ACCOUNT_DAY = ""
                 + "SELECT ACCOUNT_DATE " +
                 "FROM T_ACCOUNT_LOG " +
                 "ORDER BY ID DESC " +
                 "LIMIT 1  ";
             public const string SELECT_LEEK_PHONE_BY_DATE = ""
+                + "SELECT L.*,P.PHONE,M.* " +
+                "FROM T_MEMBER_LEEK L ,T_MEMBER_PHONE P,T_BASE_MEMBER M " +
+                "WHERE L.LEEK_MEMBER_ID = P.MEMBER_ID " +
+                "AND L.MEMBER_ID = M.MEMBER_ID " +
+                "AND PHONE <> ''  " +
+                "AND P.FLAG='1' " +
+                "AND P.SHOP_TYPE='2' " +
+                "AND L.CREATETIME <STR_TO_DATE('{0}', '%Y-%m-%d') ";
+            public const string SELECT_LEEK_PHONE_BY_DATE_FLAG = ""
+                + "SELECT L.*,P.ID AS PID,P.PHONE " +
+                "FROM T_MEMBER_LEEK L ,T_MEMBER_PHONE P " +
+                "WHERE L.LEEK_MEMBER_ID = P.MEMBER_ID " +
+                "AND PHONE <> ''  " +
+                "AND P.FLAG='1' " +
+                "AND P.SHOP_TYPE='2' " +
+                "AND DATE_FORMAT(L.CREATETIME,'%Y-%m-%d') = '{0}' ";
+            public const string SELECT_LEEK_PHONE_BY_FLAG = ""
                 + "SELECT * " +
                 "FROM T_MEMBER_LEEK L ,T_MEMBER_PHONE P " +
                 "WHERE L.LEEK_MEMBER_ID = P.MEMBER_ID " +
-                "AND PHONE <> '' " +
-                "AND L.CREATETIME <STR_TO_DATE('{0}', '%Y-%m-%d') ";
+                "AND PHONE <> ''  " +
+                "AND L.FLAG='1' ";
             public const string SELECT_RECHARGE_LIST_BY_PHONES = ""
                 + "SELECT U.CHAT_USER_ID,C.ALLREC_MONEY/10 as ALLREC_MONEY " +
                 "FROM REPORT_RECHARGE_COUNT C ,U_USER U " +
@@ -772,13 +935,22 @@ namespace ACBC.Dao
                 "AND C.INSERT_DATE = '{0}' " +
                 "AND U.CHAT_USER_ID in ({1}) " +
                 "AND ALLREC_MONEY >0";
+            public const string SELECT_RECHARGE_LIST_BY_PHONES_3MONTHAGO = ""
+                + "SELECT U.CHAT_USER_ID " +
+                "FROM REPORT_RECHARGE_COUNT C ,U_USER U " +
+                "WHERE C.USER_ID = U.USER_ID " +
+                "AND C.INSERT_DATE BETWEEN '{0}' and '{1}' " +
+                "AND U.CHAT_USER_ID in ({2}) " +
+                "AND ALLREC_MONEY >0 " +
+                "GROUP BY U.CHAT_USER_ID";
             public const string SELECT_PROPORTION = ""
                 + "SELECT CONFIG_VALUE FROM T_SYS_CONFIG WHERE CONFIG_CODE='001'";
 
 
             public const string ADD_ACCOUNT = ""
-                + "INSERT INTO T_ACCOUNT_LIST(ACOUNT_DATE,MEMBER_ID,MEMBER_NAME,PHONE,ACOUNT_PRICE,RESELLER_PRICE,CREATETIME) "
-                + "VALUES('{0}',{1},'{2}','{3}',{4},{5},NOW())";
+                + "INSERT INTO T_ACCOUNT_LIST(ACOUNT_DATE,MEMBER_ID,MEMBER_NAME,PHONE,ACOUNT_PRICE,RESELLER_PRICE," 
+                + "CREATETIME,RESELLER_MEMBER_ID,RESELLER_TYPE,STATE) "
+                + "VALUES('{0}',{1},'{2}','{3}',{4},{5},NOW(),'{6}','{7}','0')";
             public const string ADD_ACCOUNT_LOG = ""
                 + "INSERT INTO T_ACCOUNT_LOG(ACCOUNT_COUNT,ACCOUNT_DATE,CREATETIME) "
                 + "VALUES('{0}','{1}',NOW())";
@@ -803,28 +975,39 @@ namespace ACBC.Dao
             public const string SELECT_LEEKTOTAL_BY_MEMBERID = ""
                 + "SELECT COUNT(*) " +
                 "FROM T_MEMBER_LEEK T " +
-                "WHERE T.MEMBER_ID = '{0}'";
+                "WHERE T.MEMBER_ID = '{0}'  " +
+                "AND FLAG='1' ";
             public const string SELECT_LEEKTODAY_BY_MEMBERID = ""
                 + "SELECT COUNT(*) FROM T_MEMBER_LEEK T " +
-                "WHERE T.MEMBER_ID = '{0}' " +
+                "WHERE T.MEMBER_ID = '{0}'  " +
+                "AND T.FLAG='1' " +
                 "AND DATE_FORMAT(CREATETIME,'%Y-%m-%d')  = DATE_FORMAT(NOW(),'%Y-%m-%d')";
             public const string SELECT_LEEKACTIVE_BY_MEMBERID = ""
                 + "SELECT  A.MEMBER_ID,COUNT(*) " +
-                "FROM T_MEMBER_LEEK T,T_ACCOUNT_LIST A " +
-                "WHERE A.MEMBER_ID = T.LEEK_MEMBER_ID " +
-                "AND T.MEMBER_ID = '{0}'  " +
+                "FROM T_ACCOUNT_LIST A " +
+                "WHERE RESELLER_MEMBER_ID = '{0}'  " +
                 "GROUP BY A.MEMBER_ID";
             public const string SELECT_RESELLERTOTAL_BY_MEMBERID = ""
                 + "SELECT  IFNULL(SUM(IFNULL(A.RESELLER_PRICE,0)),0) " +
-                "FROM T_MEMBER_LEEK T,T_ACCOUNT_LIST A " +
-                "WHERE A.MEMBER_ID = T.LEEK_MEMBER_ID " +
-                "AND T.MEMBER_ID = '{0}'";
+                "FROM T_ACCOUNT_LIST A " +
+                "WHERE RESELLER_MEMBER_ID = '{0}' ";
+            public const string SELECT_INCOME_RESELLERTOTAL_BY_MEMBERID = ""
+                + "SELECT  IFNULL(SUM(IFNULL(A.RESELLER_PRICE,0)),0) " +
+                "FROM T_ACCOUNT_LIST A " +
+                "WHERE RESELLER_MEMBER_ID = '{0}' " +
+                "AND STATE ='0' ";
             public const string SELECT_RESELLERMONTHTOTAL_BY_MEMBERID = ""
                 + "SELECT  IFNULL(SUM(IFNULL(A.RESELLER_PRICE,0)),0) " +
-                "FROM T_MEMBER_LEEK T,T_ACCOUNT_LIST A " +
-                "WHERE A.MEMBER_ID = T.LEEK_MEMBER_ID " +
-                "AND T.MEMBER_ID = '{0}' " +
+                "FROM T_ACCOUNT_LIST A " +
+                "WHERE RESELLER_MEMBER_ID = '{0}' " +
                 "AND DATE_FORMAT(A.ACOUNT_DATE,'%Y-%m')  = DATE_FORMAT(NOW(),'%Y-%m')";
+            public const string SELECT_BILL_BY_MEMBERID =
+                "SELECT * " +
+                "FROM T_BILL_LIST  " +
+                "WHERE MEMBER_ID = '{0}'   ";
+            public const string UPDATE_MEMBER_LEEK_BY_PHONE =
+                "UPDATE T_MEMBER_PHONE SET FLAG='0' " +
+                "WHERE ID IN ({0})   ";
         }
         
         /// <summary>
@@ -1039,6 +1222,75 @@ namespace ACBC.Dao
             public bool auto_color;
             public int width;
             public bool is_hyaline;
+        }
+        private string getRemoteParam(Param param, string name, string code)
+        {
+            string appId = Global.LYAppId;
+            string appSecret = Global.LYAppSecret;
+            //string code = "1";
+            string placeHold = Global.LYPlaceHold;
+            string nonceStr = DateTime.Now.ToString("MMddHHmmss");
+            string paramS = Regex.Replace(JsonConvert.SerializeObject(param), "\"(.+?)\"",
+                 new MatchEvaluator(
+                    (s) =>
+                    {
+                        return s.ToString().Replace(" ", placeHold);
+                    }))
+                    .Replace("\n", "")
+                    .Replace("\r", "")
+                    .Replace(" ", "")
+                    .Replace(placeHold, " ");
+            string needMd5 = appId + nonceStr + appSecret + paramS;
+            string md5S = "";
+            using (var md5 = MD5.Create())
+            {
+                var result = md5.ComputeHash(Encoding.UTF8.GetBytes(needMd5));
+                var strResult = BitConverter.ToString(result);
+                md5S = strResult.Replace("-", "");
+            }
+
+            PostParam postParam = new PostParam
+            {
+                sign = md5S,
+                code = code,
+                nonceStr = nonceStr,
+                method = name,
+                appId = appId,
+                param = param,
+            };
+
+            return JsonConvert.SerializeObject(postParam);
+        }
+        public class Param { }
+
+        public class CommitBy3rdUserParam: Param
+        {
+            public string phone;
+            public string avatarUrl;
+            public string gender;
+            public string nickName;
+            public string preOrderId;
+            public string goodsId;
+            public int goodsNum = 1;
+            public string state;
+            public string addr;
+            public int heartAdd = 0;
+            public string heartFromId;
+        }
+        public class PostParam
+        {
+            public string sign;
+            public string code;
+            public string nonceStr;
+            public string method;
+            public string appId;
+            public Param param;
+        }
+        public class ReturnItem
+        {
+            public bool success;
+            public Message msg;
+            public string data;
         }
     }
 }

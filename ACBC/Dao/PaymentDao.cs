@@ -130,7 +130,7 @@ namespace ACBC.Dao
             builder1.AppendFormat(PaymentSqls.INSERT_BILL, billId, memberId, resellerGoods.goodsPrice,
                                 resellerGoods.goodsId, resellerGoods.barcode, resellerGoods.goodsName, 
                                 resellerGoods.goodsImg, resellerGoods.goodsNum,paymentParam.buyerName,
-                                paymentParam.buyerPhone, paymentParam.buyerAddr);
+                                paymentParam.buyerPhone, paymentParam.buyerAddr, resellerGoods.goodsType);
             string sql1 = builder1.ToString();
 
             if (DatabaseOperationWeb.ExecuteDML(sql1))
@@ -181,8 +181,8 @@ namespace ACBC.Dao
             public const string INSERT_BILL =
                 "INSERT INTO T_BILL_LIST(BILL_ID, MEMBER_ID, BILL_TIME, BILL_STATE, BILL_PRICE, " +
                                       "GOODS_ID, BARCODE, GOODS_NAME, GOODS_IMG, GOODS_NUM," +
-                                      "BUYER_NAME,BUYER_PHONE,BUYER_ADDR) " +
-                "VALUES('{0}','{1}',NOW(),'1',{2},'{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')";
+                                      "BUYER_NAME,BUYER_PHONE,BUYER_ADDR, GOODS_TYPE) " +
+                "VALUES('{0}','{1}',NOW(),'1',{2},'{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')";
         }
     }
 }
