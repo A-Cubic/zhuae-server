@@ -152,7 +152,7 @@ namespace ACBC.Buss
 
             MemberDao memberDao = new MemberDao();
             string memberId = Utils.GetMemberID(baseApi.token);
-
+            memberDao.addLog("LEEK",memberId, param.memberId);
             if (memberDao.checkMemberLeek(param.memberId, memberId) == "20005")
             {
                 throw new ApiException(CodeMessage.MemberLeekBindSameExists, "MemberLeekBindSameExists");

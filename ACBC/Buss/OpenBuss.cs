@@ -103,7 +103,7 @@ namespace ACBC.Buss
             sessionUser.userType = "MEMBER";
             sessionBag.Name = JsonConvert.SerializeObject(sessionUser);
             SessionContainer.Update(sessionBag.Key, sessionBag, new TimeSpan(Global.SESSION_EXPIRY_H, Global.SESSION_EXPIRY_M, Global.SESSION_EXPIRY_S));
-
+            openDao.checkLeekLog(openID, member.memberId);
             return "";
         }
 

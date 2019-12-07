@@ -669,6 +669,14 @@ namespace ACBC.Dao
             }
         }
 
+        public void addLog(string logType, string memberId, string logValue)
+        {
+            StringBuilder builder1 = new StringBuilder();
+            builder1.AppendFormat(MemberSqls.ADD_LOG, logType, memberId, logValue);
+            string sql1 = builder1.ToString();
+            DatabaseOperationWeb.ExecuteDML(sql1);
+        }
+
         public List<ResellerGoods> getResellerGoods()
         {
             List<ResellerGoods> list = new List<ResellerGoods>();
@@ -844,6 +852,14 @@ namespace ACBC.Dao
             }
             return "";
         }
+
+        public void addLeekLog(string memberId, string openId)
+        {
+            StringBuilder builder1 = new StringBuilder();
+            builder1.AppendFormat(MemberSqls.ADD_LEEK_LOG, memberId, openId);
+            string sql1 = builder1.ToString();
+            DatabaseOperationWeb.ExecuteDML(sql1);
+        }
         private class MemberSqls
         {
             public const string SELECT_PHONE_LIST_BY_MEMBER_ID = ""
@@ -1008,6 +1024,9 @@ namespace ACBC.Dao
             public const string UPDATE_MEMBER_LEEK_BY_PHONE =
                 "UPDATE T_MEMBER_PHONE SET FLAG='0' " +
                 "WHERE ID IN ({0})   ";
+            public const string ADD_LEEK_LOG = ""
+                + "INSERT INTO T_MEMBER_LEEK_LOG(MEMBER_ID,LEEK_OPEN_ID,CREATETIME) "
+                + "VALUES('{0}','{1}',NOW())";
         }
         
         /// <summary>

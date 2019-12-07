@@ -125,6 +125,31 @@ namespace ACBC.Dao
             string sql1 = builder1.ToString();
             DatabaseOperationWeb.ExecuteDML(sql1);
         }
+
+        public void checkLeekLog(string openId,string leekMemberId)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OpenSqls.SELECT_LEEK_LOG, openId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count >0)
+            {
+                string memberId = dt.Rows[0]["MEMBER_ID"].ToString();
+                MemberDao memberDao = new MemberDao();
+                if (memberDao.checkMemberLeek(memberId, leekMemberId) == "20005")
+                {
+                    
+                }
+                else if (memberDao.checkMemberLeek(memberId, leekMemberId) == "20006")
+                {
+
+                }
+                else
+                {
+                    memberDao.addLeek(memberId, leekMemberId);
+                }
+            }
+        }
         private class OpenSqls
         {
             public const string SELECT_MEMBER_BY_OPENID = ""
@@ -157,6 +182,12 @@ namespace ACBC.Dao
             public const string ADD_LOG = ""
                 + "INSERT INTO T_BASE_LOG(LOG_TYPE,MEMBER_ID,LOG_TIME,LOG_VALUE) "
                 + "VALUES('{0}','{1}',NOW(),'{2}')";
+            public const string SELECT_LEEK_LOG = ""
+                + "SELECT * "
+                + "FROM T_MEMBER_LEEK_LOG "
+                + "WHERE LEEK_OPEN_ID = '{0}' "
+                + "AND FLAG ='0' " 
+                + "ORDER BY ID ASC LIMIT 1";
         }
     }
 }
