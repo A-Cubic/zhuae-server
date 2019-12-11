@@ -128,8 +128,14 @@ namespace ACBC.Buss
                 {
                     throw new ApiException(CodeMessage.MemberPhoneError, "MemberPhoneError");
                 }
+            }else if (param.shopType == "2")
+            {
+                if (!memberDao.checkZhuaEMemberPhone(param.userPhone))
+                {
+                    throw new ApiException(CodeMessage.MemberPhoneError, "MemberPhoneError");
+                }
             }
-            
+
             if (!memberDao.addMemberPhone(memberId, param.userPhone, param.shopType))
             {
                 throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
@@ -218,13 +224,6 @@ namespace ACBC.Buss
             MemberDao memberDao = new MemberDao();
             return memberDao.getAccountListByMemberIdAndPageNum(memberId, getGoodsListParam.pageNum);
 
-        }
-
-        public object Do_HandleAccount(BaseApi baseApi)
-        {
-            MemberDao memberDao = new MemberDao();
-            memberDao.getAccountSelectList();
-            return "";
         }
         public object Do_AddReseller(BaseApi baseApi)
         {

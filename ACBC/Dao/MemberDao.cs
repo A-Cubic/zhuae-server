@@ -215,6 +215,34 @@ namespace ACBC.Dao
             }
         }
 
+        public bool checkZhuaEMemberPhone(string phone)
+        {
+            try
+            {
+                DatabaseOperationWeb.TYPE = new DBManagerZE();
+                StringBuilder builder2 = new StringBuilder();
+                builder2.AppendFormat(MemberSqls.SELECT_ZHUAE_USER_BY_PHONE,  phone);
+                string sql2 = builder2.ToString();
+                DataTable dt2 = DatabaseOperationWeb.ExecuteSelectDS(sql2, "T").Tables[0];
+                if (dt2 != null && dt2.Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException(CodeMessage.ACCOUNTZEExists, "ACCOUNTZEExists");
+            }
+            finally
+            {
+                DatabaseOperationWeb.TYPE = new DBManager();
+            }
+        }
+
         public string checkMemberPhone(string phone, string shopType)
         {
             StringBuilder builder = new StringBuilder();
@@ -233,7 +261,70 @@ namespace ACBC.Dao
             StringBuilder builder = new StringBuilder();
             builder.AppendFormat(MemberSqls.ADD_MEMBER_PHONE, memberId, phone, shopType);
             string sql = builder.ToString();
-            return DatabaseOperationWeb.ExecuteDML(sql);
+            if (DatabaseOperationWeb.ExecuteDML(sql))
+            {
+                if (shopType=="2")
+                {
+                    StringBuilder builder1 = new StringBuilder();
+                    builder1.AppendFormat(MemberSqls.SELECT_MEMBER_BY_MEMBER_ID, memberId);
+                    string sql1 = builder1.ToString();
+                    DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(sql1, "T").Tables[0];
+                    if (dt1 != null && dt1.Rows.Count > 0)
+                    {
+                        int nums = getBindingGiveNums();
+                        if (nums > 0)
+                        {
+                            if (dt1.Rows[0]["IF_BINDING_GIVE"].ToString() == "0")
+                            {
+                                try
+                                {
+                                    DatabaseOperationWeb.TYPE = new DBManagerZE();
+                                    StringBuilder builder2 = new StringBuilder();
+                                    builder2.AppendFormat(MemberSqls.UPDATE_ZHUAE_USER_BY_PHONE, phone,nums);
+                                    string sql2 = builder2.ToString();
+                                    DatabaseOperationWeb.ExecuteDML(sql2);
+                                }
+                                catch (Exception ex)
+                                {
+                                    throw new ApiException(CodeMessage.ACCOUNTZEExists, "ACCOUNTZEExists");
+                                }
+                                finally
+                                {
+                                    DatabaseOperationWeb.TYPE = new DBManager();
+                                }
+
+                                addLog("BINDING_GIVE", memberId, "phone:" + phone + ";nums:" + nums);
+                                StringBuilder builder3 = new StringBuilder();
+                                builder3.AppendFormat(MemberSqls.UPDATE_MEMBER_BINDINGGIVE, memberId);
+                                string sql3 = builder3.ToString();
+                                DatabaseOperationWeb.ExecuteDML(sql3);
+                            }
+                        }
+                        
+                    }
+                }
+                return true; 
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public int getBindingGiveNums()
+        {
+            StringBuilder builder1 = new StringBuilder();
+            builder1.AppendFormat(MemberSqls.SELECT_SYSCONFIG_BY_CODES, "'002','003'");
+            string sql1 = builder1.ToString();
+            DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(sql1, "T").Tables[0];
+            if (dt1 != null && dt1.Rows.Count ==2)
+            {
+                if (dt1.Rows[0]["CONFIG_VALUE"].ToString() == "1")
+                {
+                    return Convert.ToInt32(dt1.Rows[1]["CONFIG_VALUE"]);
+                }
+            }
+            return 0;
         }
 
         public string checkMemberLeek(string memberId, string leekMemberId)
@@ -538,7 +629,7 @@ namespace ACBC.Dao
             {
                 double proportion = getProportion();
                 DateTime maxDate = Convert.ToDateTime(dt.Rows[0][0]).AddDays(1);
-                for (DateTime i = maxDate; i < DateTime.Now; i = i.AddDays(1))
+                for (DateTime i = maxDate; i < DateTime.Now.AddDays(-1); i = i.AddDays(1))
                 {
                     HandleAccountPhone(i);
                     ArrayList al = new ArrayList();
@@ -1027,6 +1118,26 @@ namespace ACBC.Dao
             public const string ADD_LEEK_LOG = ""
                 + "INSERT INTO T_MEMBER_LEEK_LOG(MEMBER_ID,LEEK_OPEN_ID,CREATETIME) "
                 + "VALUES('{0}','{1}',NOW())";
+
+            public const string SELECT_ZHUAE_USER_BY_PHONE =
+                "SELECT * " +
+                "FROM  U_USER " +
+                "WHERE CHAT_USER_ID = '{0}'";
+            public const string SELECT_SYSCONFIG_BY_CODES =
+                "SELECT * " +
+                "FROM T_SYS_CONFIG " +
+                "WHERE CONFIG_CODE IN ({0}) " +
+                "ORDER BY CONFIG_CODE ASC";
+            public const string UPDATE_ZHUAE_USER_BY_PHONE =
+                "UPDATE F_BALANCE " +
+                "SET TRUE_BALANCE = TRUE_BALANCE+{1} " +
+                "WHERE USER_ID = (SELECT USER_ID " +
+                                   "FROM  U_USER U  " +
+                                  "WHERE CHAT_USER_ID = '{0}' " +
+                                  "LIMIT 1)";
+            public const string UPDATE_MEMBER_BINDINGGIVE = ""
+                + "UPDATE T_BASE_MEMBER SET IF_BINDING_GIVE='1'  "
+                + "WHERE MEMBER_ID='{0}'";
         }
         
         /// <summary>

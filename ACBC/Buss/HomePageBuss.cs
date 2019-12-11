@@ -139,5 +139,12 @@ namespace ACBC.Buss
             }
             return "";
         }
+
+        public object Do_HandleAccount(BaseApi baseApi)
+        {
+            MemberDao memberDao = new MemberDao();
+            memberDao.getAccountSelectList();
+            return "";
+        }
     }
 }
