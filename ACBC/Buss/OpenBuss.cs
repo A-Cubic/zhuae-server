@@ -201,5 +201,46 @@ namespace ACBC.Buss
 
             return "";
         }
+        public object Do_AddLeek(BaseApi baseApi)
+        {
+            MemberParam param = JsonConvert.DeserializeObject<MemberParam>(baseApi.param.ToString());
+            if (param == null)
+            {
+                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
+            }
+            if (param.memberId == null || param.memberId == "")
+            {
+                throw new ApiException(CodeMessage.InterfaceValueError, "InterfaceValueError");
+            }
+
+            MemberDao memberDao = new MemberDao();
+            string memberId = Utils.GetMemberID(baseApi.token);
+            if (memberId == null)
+            {
+                string openId = Utils.GetOpenID(baseApi.token);
+                memberDao.addLog("LEEK", openId, param.memberId);
+                memberDao.addLeekLog(param.memberId, openId);
+            }
+            else
+            {
+                memberDao.addLog("LEEK", memberId, param.memberId);
+                if (memberDao.checkMemberLeek(param.memberId, memberId) == "20005")
+                {
+                    throw new ApiException(CodeMessage.MemberLeekBindSameExists, "MemberLeekBindSameExists");
+                }
+                else if (memberDao.checkMemberLeek(param.memberId, memberId) == "20006")
+                {
+                    throw new ApiException(CodeMessage.MemberLeekBindOtherExists, "MemberLeekBindOtherExists");
+                }
+
+                if (!memberDao.addLeek(param.memberId, memberId))
+                {
+                    throw new ApiException(CodeMessage.MemberBindExists, "MemberBindExists");
+
+                }
+            }
+            return "";
+        }
+
     }
 }
