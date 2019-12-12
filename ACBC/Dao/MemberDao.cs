@@ -280,9 +280,16 @@ namespace ACBC.Dao
                                 {
                                     DatabaseOperationWeb.TYPE = new DBManagerZE();
                                     StringBuilder builder2 = new StringBuilder();
-                                    builder2.AppendFormat(MemberSqls.UPDATE_ZHUAE_USER_BY_PHONE, phone,nums);
+                                    builder2.AppendFormat(MemberSqls.UPDATE_ZHUAE_USER_BY_PHONE, phone, nums);
                                     string sql2 = builder2.ToString();
-                                    DatabaseOperationWeb.ExecuteDML(sql2);
+
+                                    StringBuilder builder4 = new StringBuilder();
+                                    builder4.AppendFormat(MemberSqls.ADD_LOG, "AddFBALANCE", phone, nums);
+                                    string sql4 = builder4.ToString();
+                                    ArrayList al = new ArrayList();
+                                    al.Add(sql2);
+                                    al.Add(sql4);
+                                    DatabaseOperationWeb.ExecuteDML(al);
                                 }
                                 catch (Exception ex)
                                 {
