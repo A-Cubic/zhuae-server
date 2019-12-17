@@ -498,9 +498,14 @@ namespace ACBC.Dao
             {
                 foreach (DataRow dr in dt.Rows)
                 {
+                    string state = "    已绑定电话";
+                    if (dr["phone"].ToString()=="")
+                    {
+                        state = "";
+                    }
                     Leek leek = new Leek
                     {
-                        leekName = dr["leek_name"].ToString(),
+                        leekName = dr["leek_name"].ToString()+state,
                         createTime = dr["createTime"].ToString()
                     };
                     list.Add(leek);
@@ -984,12 +989,15 @@ namespace ACBC.Dao
                 + "SELECT RESELLER_IMG "
                 + "FROM T_BASE_MEMBER "
                 + "WHERE MEMBER_ID = {0} AND IF_RESELLER='1' ";
-            public const string SELECT_RESELLERLEEK_LIST_BY_MEMBER_ID = ""
-                + "SELECT * "
-                + "FROM T_MEMBER_LEEK "
-                + "WHERE MEMBER_ID = {0} AND FLAG='1' "
-                + "ORDER BY ID DESC "
-                + "LIMIT {1},15  ";
+            public const string SELECT_RESELLERLEEK_LIST_BY_MEMBER_ID = ""+
+                  "SELECT L.* ,P.PHONE " +
+                  "FROM T_MEMBER_LEEK L LEFT JOIN T_MEMBER_PHONE P " +
+                                            "ON L.LEEK_MEMBER_ID = P.MEMBER_ID " +
+                                            "AND P.SHOP_TYPE =2  " +
+                  "WHERE  L.MEMBER_ID = 1001 " +
+                  "AND L.FLAG='1'  " +
+                  "ORDER BY L.ID DESC "+
+                  "LIMIT {1},15  ";
             public const string SELECT_RESELLERACCOUNT_LIST_BY_MEMBER_ID = ""
                 + "SELECT A.* "
                 + "FROM T_ACCOUNT_LIST A "
