@@ -994,7 +994,7 @@ namespace ACBC.Dao
                   "FROM T_MEMBER_LEEK L LEFT JOIN T_MEMBER_PHONE P " +
                                             "ON L.LEEK_MEMBER_ID = P.MEMBER_ID " +
                                             "AND P.SHOP_TYPE =2  " +
-                  "WHERE  L.MEMBER_ID = 1001 " +
+                  "WHERE  L.MEMBER_ID = {0} " +
                   "AND L.FLAG='1'  " +
                   "ORDER BY L.ID DESC "+
                   "LIMIT {1},15  ";
