@@ -243,7 +243,7 @@ namespace ACBC.Buss
 
             MemberDao memberDao = new MemberDao();
             string memberId = Utils.GetMemberID(baseApi.token);
-            memberId = "1035";
+            
 
             if (!memberDao.addReseller(param.name, param.userPhone, memberId))
             {
