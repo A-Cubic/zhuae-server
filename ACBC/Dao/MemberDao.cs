@@ -643,7 +643,7 @@ namespace ACBC.Dao
                 DateTime maxDate = Convert.ToDateTime(dt.Rows[0][0]).AddDays(1);
                 for (DateTime i = maxDate; i < DateTime.Now.AddDays(-1); i = i.AddDays(1))
                 {
-                    HandleAccountPhone(i);
+                    HandleAccountPhone(Convert.ToDateTime("2019-12-01"));
                     ArrayList al = new ArrayList();
                     string dateStr = i.ToString("yyyy-MM-dd");
                     StringBuilder builder1 = new StringBuilder();
