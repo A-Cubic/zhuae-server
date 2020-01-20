@@ -963,6 +963,31 @@ namespace ACBC.Dao
             string sql1 = builder1.ToString();
             DatabaseOperationWeb.ExecuteDML(sql1);
         }
+
+        public ActiveMember getMemberByMemberId(string memberId)
+        {
+            ActiveMember activeMember = new ActiveMember();
+
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(MemberSqls.SELECT_MEMBER_BY_MEMBER_ID, memberId);
+            string sql = builder.ToString();
+
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                DataRow dr = dt.Rows[0];
+                activeMember.memberName = dr["MEMBER_NAME"].ToString();
+                activeMember.memberImg = dr["MEMBER_IMG"].ToString();
+                activeMember.memberId = Convert.ToInt32(memberId);
+            }
+            else
+            {
+                activeMember.memberName = "";
+                activeMember.memberImg = "";
+                activeMember.memberId = 0;
+            }
+            return activeMember;
+        }
         private class MemberSqls
         {
             public const string SELECT_PHONE_LIST_BY_MEMBER_ID = ""

@@ -10,13 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Buss\ActiveBuss.cs" />
     <Compile Remove="Buss\MallBuss.cs" />
     <Compile Remove="Buss\OrderBuss.cs" />
     <Compile Remove="Buss\RemoteBuss.cs" />
     <Compile Remove="Buss\StoreBuss.cs" />
     <Compile Remove="Buss\UploadBuss.cs" />
-    <Compile Remove="Dao\ActiveDao.cs" />
     <Compile Remove="Dao\MallDao.cs" />
     <Compile Remove="Dao\OrderDao.cs" />
     <Compile Remove="Dao\RemoteDao.cs" />

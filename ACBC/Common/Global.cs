@@ -80,7 +80,7 @@ namespace ACBC.Common
         {
             string url = "http://ConfigServer/api/config/Config/Pro";
 #if DEBUG
-            url = "http://" + ConfigServer + "/api/config/Config/Dev";
+            url = "http://www.a-cubic.com/api/config/Config/Dev";
 #endif
             ConfigParam configParam = new ConfigParam
             {

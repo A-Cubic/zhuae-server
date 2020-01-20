@@ -903,5 +903,43 @@ namespace ACBC.Buss
         public string monthTotal;
         public string incomeTotal;
     }
+
+    public class ActiveList
+    {
+        public int activeId;
+        public string activeName;
+        public string flag;
+    }
+    public class ActiveMember
+    {
+        public int activeId;
+        public int memberId;
+        public string memberName;
+        public string memberImg;
+        public DateTime createTime;
+    }
+    public class LeaderBoard
+    {
+        public int id;
+        public string nickname;
+        public string money;
+    }
+    public class ActiveInfo
+    {
+        public int activeId;
+        public string activeStage;
+        public string activeValue;
+        public string activeText;
+        public string activeImg;
+    }
+
+    public class ActiveInfoParam
+    {
+        public int stage;
+    }
+    public class ActiveMemberParam
+    {
+        public int activeId;
+    }
     #endregion
 }
