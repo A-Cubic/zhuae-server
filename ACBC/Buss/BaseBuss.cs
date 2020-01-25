@@ -153,10 +153,10 @@ namespace ACBC.Buss
                 {
                     string placeHold = "__PLACEHOLD__";
                     string paramS = Regex.Replace(
-                        baseApi.param.ToString(), 
-                        "\"(.+?)\"", 
+                        baseApi.param.ToString(),
+                        "\"(.+?)\"",
                         new MatchEvaluator(
-                            (s) => 
+                            (s) =>
                             {
                                 return s.ToString().Replace(" ", placeHold);
                             }))
@@ -172,7 +172,7 @@ namespace ACBC.Buss
                         var strResult = BitConverter.ToString(result);
                         md5S = strResult.Replace("-", "");
                     }
-                    if(baseApi.sign != md5S)
+                    if (baseApi.sign != md5S)
                     {
                         msg = new Message(CodeMessage.SignError, "SignError");
                     }
@@ -317,7 +317,7 @@ namespace ACBC.Buss
             route = Global.ROUTE_PX + "/" + routeController + "/" + routeAction + "/" + baseApi.method;
             action = routeAction.Replace("/", "");
             Message msg = null;
-            switch(baseApi.GetCheckType())
+            switch (baseApi.GetCheckType())
             {
                 case CheckType.Open:
                     break;
@@ -333,7 +333,7 @@ namespace ACBC.Buss
                 default:
                     break;
             }
-            
+
             if (msg != null)
             {
                 return new ResultsJson(msg, null);

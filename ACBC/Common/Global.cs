@@ -119,6 +119,18 @@ namespace ACBC.Common
             }
         }
 
+        /// <summary>
+        /// MangoDB
+        /// </summary>
+        public static string MangoDB
+        {
+            get
+            {
+                var MangoDB = System.Environment.GetEnvironmentVariable("MangoDB");
+                return MangoDB;
+            }
+        }
+
         public static string SMS_CODE
         {
             get

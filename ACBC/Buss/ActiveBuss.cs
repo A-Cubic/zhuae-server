@@ -184,8 +184,9 @@ namespace ACBC.Buss
 
         public List<LeaderBoard> Do_getLeaderBoardList(BaseApi baseApi)
         {
-            ActiveDao activeDao = new ActiveDao();
-            List<LeaderBoard> list = activeDao.GetLeaderBoardListAll();
+            //ActiveDao activeDao = new ActiveDao();
+            MangoDBHelp mangoDBHelp = new MangoDBHelp();
+            List<LeaderBoard> list = mangoDBHelp.GetLeaderBoardListAll();
 
             return list;
         }

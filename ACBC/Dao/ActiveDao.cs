@@ -178,23 +178,26 @@ namespace ACBC.Dao
         {
             int money = 0;
             int add_money = 0;
-            try
-            {
-                DatabaseOperationWeb.TYPE = new DBManagerZE();
-                string select = OrderSqls.SELECT_TOTAL_ALLREC_MONEY;
-                DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(select, "T").Tables[0];
-                if (dt1 != null && dt1.Rows.Count > 0)
-                {
-                    int.TryParse(dt1.Rows[0][0].ToString(), out money);
-                }
-            }
-            catch (Exception e)
-            { 
-            }
-            finally
-            {
-                DatabaseOperationWeb.TYPE = new DBManager();
-            }
+            //try
+            //{
+            //    DatabaseOperationWeb.TYPE = new DBManagerZE();
+            //    string select = OrderSqls.SELECT_TOTAL_ALLREC_MONEY;
+            //    DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(select, "T").Tables[0];
+            //    if (dt1 != null && dt1.Rows.Count > 0)
+            //    {
+            //        int.TryParse(dt1.Rows[0][0].ToString(), out money);
+            //    }
+            //}
+            //catch (Exception e)
+            //{ 
+            //}
+            //finally
+            //{
+            //    DatabaseOperationWeb.TYPE = new DBManager();
+            //}
+            MangoDBHelp mangoDBHelp = new MangoDBHelp();
+            money = mangoDBHelp.getTotalPrice();
+
             StringBuilder builder = new StringBuilder();
 
             builder.AppendFormat(OrderSqls.SELECT_ADD_TEMP_ALLREC_MONEY, "NewYear");

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -230,5 +231,24 @@ namespace ACBC.Common
             }
             return tempLen;
         }
+        public static string FilterChar(string input)
+        {
+            Regex r = new Regex("^[0-9]{1,}$"); //正则表达式 表示数字的范围 ^符号是开始，$是关闭
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in input)
+            {
+                if (item >= 0x4e00 && item <= 0x9fbb)//汉字范围
+                {
+                    sb.Append(item);
+                }
+
+                if (Regex.IsMatch(item.ToString(), @"[A-Za-z0-9]"))
+                {
+                    sb.Append(item);
+                }
+            }
+            return sb.ToString();
+        }
+
     }
 }
