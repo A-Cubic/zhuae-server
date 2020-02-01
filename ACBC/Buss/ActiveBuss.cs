@@ -104,26 +104,27 @@ namespace ACBC.Buss
         /// <returns>如添加成功，则返回true，相反，则返回false</returns>
         public string Do_AddActiveMember(BaseApi baseApi)
         {
-            ActiveMemberParam activeMemberParam = JsonConvert.DeserializeObject<ActiveMemberParam>(baseApi.param.ToString());
+            throw new ApiException(CodeMessage.ACCOUNTExists, "ACCOUNTExists");
+            //ActiveMemberParam activeMemberParam = JsonConvert.DeserializeObject<ActiveMemberParam>(baseApi.param.ToString());
 
-            if (activeMemberParam == null)
-            {
-                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
-            }
-            string memberId = Utils.GetMemberID(baseApi.token);
+            //if (activeMemberParam == null)
+            //{
+            //    throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
+            //}
+            //string memberId = Utils.GetMemberID(baseApi.token);
 
-            MemberDao memberDao = new MemberDao();
-            ActiveMember activeMember = memberDao.getMemberByMemberId(memberId);
-            activeMember.activeId = activeMemberParam.activeId;
-            activeMember.createTime = new DateTime();
+            //MemberDao memberDao = new MemberDao();
+            //ActiveMember activeMember = memberDao.getMemberByMemberId(memberId);
+            //activeMember.activeId = activeMemberParam.activeId;
+            //activeMember.createTime = new DateTime();
 
-            if (activeMember.memberId == 0) return "false";
+            //if (activeMember.memberId == 0) return "false";
 
-            ActiveDao activeDao = new ActiveDao();
-            bool res = activeDao.AddActiveMember(activeMember);
+            //ActiveDao activeDao = new ActiveDao();
+            //bool res = activeDao.AddActiveMember(activeMember);
 
-            if (res) return "true";
-            else return "false";
+            //if (res) return "true";
+            //else return "false";
 
         }
 
@@ -186,8 +187,32 @@ namespace ACBC.Buss
         {
             //ActiveDao activeDao = new ActiveDao();
             MangoDBHelp mangoDBHelp = new MangoDBHelp();
-            List<LeaderBoard> list = mangoDBHelp.GetLeaderBoardListAll();
-
+            //List<LeaderBoard> list = mangoDBHelp.GetLeaderBoardListAll();
+            List<LeaderBoard> list = new List<LeaderBoard>();
+            LeaderBoard l1 = new LeaderBoard();
+            l1.nickname = "29Bru...";
+            l1.money = "8800";
+            list.Add(l1);
+            LeaderBoard l2 = new LeaderBoard();
+            l2.nickname = "油丶饼";
+            l2.money = "4370";
+            list.Add(l2);
+            LeaderBoard l3 = new LeaderBoard();
+            l3.nickname = "哈登MVP";
+            l3.money = "4240";
+            list.Add(l3);
+            LeaderBoard l4 = new LeaderBoard();
+            l4.nickname = "AvofM";
+            l4.money = "3890";
+            list.Add(l4);
+            LeaderBoard l5 = new LeaderBoard();
+            l5.nickname = "差不多的一生";
+            l5.money = "3590";
+            list.Add(l5);
+            LeaderBoard l6 = new LeaderBoard();
+            l6.nickname = "李贺唯";
+            l6.money = "2890";
+            list.Add(l6);
             return list;
         }
 

@@ -176,39 +176,22 @@ namespace ACBC.Dao
          * */
         public int getMoney()
         {
-            int money = 0;
-            int add_money = 0;
-            //try
-            //{
-            //    DatabaseOperationWeb.TYPE = new DBManagerZE();
-            //    string select = OrderSqls.SELECT_TOTAL_ALLREC_MONEY;
-            //    DataTable dt1 = DatabaseOperationWeb.ExecuteSelectDS(select, "T").Tables[0];
-            //    if (dt1 != null && dt1.Rows.Count > 0)
-            //    {
-            //        int.TryParse(dt1.Rows[0][0].ToString(), out money);
-            //    }
-            //}
-            //catch (Exception e)
-            //{ 
-            //}
-            //finally
-            //{
-            //    DatabaseOperationWeb.TYPE = new DBManager();
-            //}
-            MangoDBHelp mangoDBHelp = new MangoDBHelp();
-            money = mangoDBHelp.getTotalPrice();
+            //int money = 0;
+            //int add_money = 0;
+            //MangoDBHelp mangoDBHelp = new MangoDBHelp();
+            //money = mangoDBHelp.getTotalPrice();
 
-            StringBuilder builder = new StringBuilder();
+            //StringBuilder builder = new StringBuilder();
 
-            builder.AppendFormat(OrderSqls.SELECT_ADD_TEMP_ALLREC_MONEY, "NewYear");
-            string sql = builder.ToString();
-            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                int.TryParse(dt.Rows[0]["ACTIVE_NUMBER"].ToString(), out add_money);
+            //builder.AppendFormat(OrderSqls.SELECT_ADD_TEMP_ALLREC_MONEY, "NewYear");
+            //string sql = builder.ToString();
+            //DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            //if (dt != null && dt.Rows.Count > 0)
+            //{
+            //    int.TryParse(dt.Rows[0]["ACTIVE_NUMBER"].ToString(), out add_money);
                 
-            }
-            return money + add_money;
+            //}
+            return 107041;
         }
 
         public bool addActiveInfo(ActiveInfo activeInfo)
