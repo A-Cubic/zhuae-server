@@ -216,6 +216,37 @@ namespace ACBC.Buss
             return list;
         }
 
+
+        public object Do_GetSimpleAwardInfo(BaseApi baseApi)
+        {
+            string memberId = Utils.GetMemberID(baseApi.token);
+
+            ActiveDao activeDao = new ActiveDao();
+            return activeDao.getSimpleAwardInfo(memberId);
+        }
+
+        public object Do_GetAwardInfo(BaseApi baseApi)
+        {
+            string memberId = Utils.GetMemberID(baseApi.token);
+
+            ActiveDao activeDao = new ActiveDao();
+            return activeDao.getAwardInfo(memberId);
+        }
+
+        public object Do_OpenBox(BaseApi baseApi)
+        {
+            string memberId = Utils.GetMemberID(baseApi.token);
+
+            ActiveDao activeDao = new ActiveDao();
+            return activeDao.OpenBox(memberId);
+        }
+
+        public object Do_GetRankingAward(BaseApi baseApi)
+        {
+            ActiveDao activeDao = new ActiveDao();
+            return activeDao.getRankingAward();
+        }
+
         /****************************
         public object Do_GetQbuyList(BaseApi baseApi)
         {
@@ -225,17 +256,7 @@ namespace ACBC.Buss
             return list;
         }
 
-        public object Do_GetQbuyGoodsList(BaseApi baseApi)
-        {
-            QbuyParam qbuyParam = JsonConvert.DeserializeObject<QbuyParam>(baseApi.param.ToString());
-            if (qbuyParam == null)
-            {
-                throw new ApiException(CodeMessage.InvalidParam, "InvalidParam");
-            }
-            ActiveDao activeDao = new ActiveDao();
-            var list = activeDao.GetQbuyGoodsListByQbuyId(qbuyParam.qbuyCode);
-            return list;
-        }
+       
 
         public object Do_StartQBuyGoods(BaseApi baseApi)
         {

@@ -260,6 +260,250 @@ namespace ACBC.Dao
             return list;
         }
 
+        public List<SimpleAwardInfo> getSimpleAwardInfo(string memberId)
+        {
+            List<SimpleAwardInfo> list = new List<SimpleAwardInfo>();
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OrderSqls.SELECT_AWARD_BY_MEMBERID, memberId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    string date = Convert.ToDateTime(dr["temp_day"]).ToString("M月dd日");
+                    int state = 0;
+                    List<string> goods = new List<string>();
+                    if (dr["ACTIVE_NAME"].ToString() != "")
+                    {
+                        string[] sts = dr["ACTIVE_NAME"].ToString().Split(",");
+                        foreach (var st in sts)
+                        {
+                            goods.Add(st);
+                        }
+                        state = 1;
+                    }
+                    else
+                    {
+                        if (Convert.ToDateTime(dr["temp_day"]).AddDays(1) < DateTime.Now)
+                        {
+                            state = 2;
+                            string st = "已经过期";
+                            goods.Add(st);
+                        }
+                        else
+                        {
+                            state = 0;
+                            string st = "敬请期待";
+                            goods.Add(st);
+                        }
+                    }
+                    SimpleAwardInfo simpleAwardInfo = new SimpleAwardInfo
+                    {
+                        active_day = date,
+                        state = state,
+                        goods = goods
+                    };
+                    list.Add(simpleAwardInfo);
+                }
+
+            }
+
+            return list;
+
+        }
+
+        public List<ExplicitAwardInfo> getAwardInfo(string memberId)
+        {
+            List<ExplicitAwardInfo> list = new List<ExplicitAwardInfo>();
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OrderSqls.SELECT_AWARD_INFO_BY_MEMBERID, memberId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    string date = Convert.ToDateTime(dr["ACTIVE_DAY"]).ToString("M月dd日");
+                    string heartState = "";       //心值的状态
+                    int heart = 0;                  //心值数据
+                    string coinState = "";          //硬币的状态
+                    int coin = 0;                 //币数据
+                    string goodstate = "";        //商品的状态
+                    string good = "";             // 商品数据
+
+                    if (dr["ACTIVE_NAME"].ToString() != "")
+                    {
+                        string[] sts = dr["ACTIVE_NAME"].ToString().Split(",");
+                        foreach (var st in sts)
+                        {
+                            string[] temp = st.Split("#");
+                            if (temp.Length > 3)
+                            {
+                                if (temp[0] == "1")
+                                {
+                                    int.TryParse(temp[2], out coin);
+                                    coinState = temp[3];
+                                }
+                                else if (temp[0] == "2")
+                                {
+                                    int.TryParse(temp[2], out heart);
+                                    heartState = temp[3];
+                                }
+                                else if (temp[0] == "3")
+                                {
+                                    good = temp[1] + " " + temp[2];
+                                    goodstate = temp[3];
+                                }
+                            }
+
+                        }
+                    }
+                    ExplicitAwardInfo explicitAwardInfo = new ExplicitAwardInfo
+                    {
+                        active_day = date,
+                        heartState = heartState,
+                        heart = heart,
+                        coinState = coinState,
+                        coin = coin,
+                        goodstate = goodstate,
+                        good = good,
+                    };
+                    list.Add(explicitAwardInfo);
+                }
+
+            }
+
+            return list;
+
+        }
+
+        public RandomAwardInfo OpenBox(string memberId)
+        {
+            RandomAwardInfo randomAwardInfo = new RandomAwardInfo();
+            StringBuilder builder = new StringBuilder();
+            //builder.AppendFormat(OrderSqls.SELECT_AWARD_SETTING, DateTime.Now.ToString("yyyy-MM-dd"));
+            builder.AppendFormat(OrderSqls.SELECT_AWARD_SETTING, "2020-02-08");
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                int heart=0;  //心值数据
+                int coin = 0; //币数据
+                string good="";// 商品数据（无商品为 ””）
+                ArrayList al = new ArrayList();
+                DataRow[] drs = dt.Select(" AWARD_TYPE='1' ");
+                if (drs.Length > 0)
+                {
+                    int max = Convert.ToInt32(drs[0]["AWARD_NUM"]);
+                    int min = max * Convert.ToInt32(drs[0]["AWARD_RANDOM"]) / 100;
+                    Random random = new Random();
+                    coin = random.Next(min, max);
+                    StringBuilder builder1 = new StringBuilder();
+                    builder1.AppendFormat(OrderSqls.INSERT_AWARD_INFO, memberId, drs[0]["AWARD_TYPE"].ToString(),
+                                           drs[0]["AWARD_NAME"].ToString(), drs[0]["AWARD_NUM"].ToString(),
+                                           drs[0]["AWARD_BARCODE"].ToString() );
+                    al.Add(builder1.ToString());
+                }
+                DataRow[] drs1 = dt.Select(" AWARD_TYPE='2' ");
+                if (drs1.Length > 0)
+                {
+                    int max = Convert.ToInt32(drs1[0]["AWARD_NUM"]);
+                    int min = max * Convert.ToInt32(drs1[0]["AWARD_RANDOM"]) / 100;
+                    Random random = new Random();
+                    heart = random.Next(min, max);
+                    StringBuilder builder1 = new StringBuilder();
+                    builder1.AppendFormat(OrderSqls.INSERT_AWARD_INFO, memberId, drs[0]["AWARD_TYPE"].ToString(),
+                                           drs[0]["AWARD_NAME"].ToString(), drs[0]["AWARD_NUM"].ToString(),
+                                           drs[0]["AWARD_BARCODE"].ToString());
+                    al.Add(builder1.ToString());
+                }
+                DataRow[] drs2 = dt.Select(" AWARD_TYPE='3' ");
+                if (drs2.Length > 0)
+                {
+                    foreach (var dr in drs2)
+                    {
+                        int awardRandom = Convert.ToInt32(dr["AWARD_RANDOM"]);
+                        Random random = new Random();
+                        int r = random.Next(1, 100);
+                        if (r<=awardRandom)
+                        {
+                            if (checkSettingNum(dr["ID"].ToString()))
+                            {
+                                if (updateSettingGoodsNum(dr["ID"].ToString()))
+                                {
+                                    StringBuilder builder1 = new StringBuilder();
+                                    builder1.AppendFormat(OrderSqls.INSERT_AWARD_INFO, memberId, dr["AWARD_TYPE"].ToString(),
+                                                           dr["AWARD_NAME"].ToString(), "1",
+                                                           dr["AWARD_BARCODE"].ToString());
+                                    al.Add(builder1.ToString());
+                                    good = dr["AWARD_NAME"].ToString() + " *1";
+                                    break;
+                                }
+                            }
+                        }
+                    } 
+                }
+                randomAwardInfo.coin = coin;
+                randomAwardInfo.heart = heart;
+                randomAwardInfo.good = good;
+                DatabaseOperationWeb.ExecuteDML(al);
+            }
+
+            return randomAwardInfo;
+
+        }
+
+
+        public List<RankingAwardInfo> getRankingAward()
+        {
+            List<RankingAwardInfo> list = new List<RankingAwardInfo>();
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OrderSqls.SELECT_RANKING_INFO);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    RankingAwardInfo rankingAwardInfo = new RankingAwardInfo
+                    {
+                        name = dr["USER_NAME"].ToString(),
+                        award = dr["USER_AWARD"].ToString(), 
+                    };
+                    list.Add(rankingAwardInfo);
+                }
+
+            }
+
+            return list;
+
+        }
+
+        public bool updateSettingGoodsNum(string id)
+        { 
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OrderSqls.UPDATE_SETTING_GOODSNUM, id);
+            string sql = builder.ToString();
+            return DatabaseOperationWeb.ExecuteDML(sql);
+        }
+
+        public bool checkSettingNum(string id)
+        { 
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OrderSqls.SELECT_AWARD_SETTING_NUM,id);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
         /***********************************
         public List<Qbuy> GetQbuyList(string memberId)
         {
@@ -414,6 +658,38 @@ namespace ACBC.Dao
                 "SELECT * FROM T_ACTIVE_TEMP_NUM WHERE ACTIVE_CODE =   '{0}'";
 
 
+
+            public const string SELECT_AWARD_BY_MEMBERID = "" +
+                "SELECT * FROM T_ACTIVE_TEMP T " +
+                "LEFT JOIN (SELECT ACTIVE_DAY, GROUP_CONCAT(CONCAT_WS(' ', AWARD_NAME, AWARD_NUM)) ACTIVE_NAME " +
+                            "FROM T_ACTIVE_AWARD " +
+                            "WHERE MEMBER_ID = 1001 " +
+                            "GROUP BY ACTIVE_DAY) A " +
+                "ON T.TEMP_DAY = ACTIVE_DAY";
+
+            public const string SELECT_AWARD_INFO_BY_MEMBERID = "" +
+                "SELECT ACTIVE_DAY,GROUP_CONCAT(CONCAT_WS('#',AWARD_TYPE,AWARD_NAME,AWARD_NUM,REMARK) ) ACTIVE_NAME " +
+                "FROM T_ACTIVE_AWARD " +
+                "WHERE MEMBER_ID = 1001 " +
+                "GROUP BY ACTIVE_DAY " +
+                "ORDER BY ACTIVE_DAY ASC";
+
+            public const string SELECT_RANKING_INFO = "" +
+                "SELECT * FROM T_ACTIVE_TEMP_RANKING";
+
+            public const string SELECT_AWARD_SETTING = "" +
+                "SELECT * FROM T_ACTIVE_AWARD_SETTING WHERE ACTIVE_DAY = '{0}' AND AWARD_NUM > 0 ";
+
+            public const string UPDATE_SETTING_GOODSNUM = "" +
+                "UPDATE   T_ACTIVE_AWARD_SETTING SET AWARD_NUM= AWARD_NUM -1  WHERE ID = {0} AND AWARD_NUM > 0";
+
+            public const string INSERT_AWARD_INFO = "" +
+                "INSERT INTO T_ACTIVE_AWARD(ACTIVE_ID,MEMBER_ID,CREATE_TIME,STATE,ACTIVE_DAY," +
+                "AWARD_TYPE,AWARD_NAME,AWARD_NUM,AWARD_BARCODE,REMARK) " +
+                "VALUES (1,{0},NOW(),'0',NOW(),'{1}','{2}','{3}','{4}','未领取')";
+
+            public const string SELECT_AWARD_SETTING_NUM = "" +
+                "SELECT * FROM T_ACTIVE_AWARD_SETTING WHERE ID = '{0}' AND AWARD_NUM > 0 ";
             /**********************************
             public const string SELECT_QBUY_LIST_BY_MEMBER_ID = ""
                 + "SELECT BQ.* ,BA.REMARK ,S.STORE_NAME " +

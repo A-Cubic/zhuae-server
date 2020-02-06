@@ -941,5 +941,37 @@ namespace ACBC.Buss
     {
         public int activeId;
     }
-    #endregion
+    public class SimpleAwardInfo
+    {
+        //public int id;
+        public string active_day; //几月几号
+        public int state;        //当天是否参加 0未参加，1已参加，2 已过期
+        public List<string> goods;//
+    }
+    public class ExplicitAwardInfo
+    { 
+        public string active_day; //几月几号  
+        public String heartState;        //心值的状态
+        public int heart;            //心值数据
+        public String coinState;        //硬币的状态
+        public int coin;             //币数据
+        public String goodstate;        //商品的状态
+        public String good;          // 商品数据
+    }
+    public class RankingAwardInfo
+    {
+        //public int id;
+        public string name; //用户名称
+        public string award; //奖品信息
+    }
+    public class RandomAwardInfo
+    {
+        //public int id;
+        public int heart;  //心值数据
+        public int coin; //币数据
+        public String good;// 商品数据（无商品为 ””）
+    }
+
+
+        #endregion
 }
