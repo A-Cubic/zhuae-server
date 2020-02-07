@@ -263,8 +263,6 @@ namespace ACBC.Dao
         public List<SimpleAwardInfo> getSimpleAwardInfo(string memberId)
         {
             List<SimpleAwardInfo> list = new List<SimpleAwardInfo>();
-            StringBuilder builder = new StringBuilder();
-            builder.AppendFormat(OrderSqls.SELECT_AWARD_BY_MEMBERID, memberId);
             if (checkActiveMember(memberId))
             {
                 StringBuilder builder = new StringBuilder();
