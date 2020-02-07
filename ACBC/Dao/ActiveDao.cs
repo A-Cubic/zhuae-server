@@ -412,8 +412,8 @@ namespace ACBC.Dao
         {
             RandomAwardInfo randomAwardInfo = new RandomAwardInfo();
             StringBuilder builder = new StringBuilder();
-            //builder.AppendFormat(OrderSqls.SELECT_AWARD_SETTING, DateTime.Now.ToString("yyyy-MM-dd"));
-            builder.AppendFormat(OrderSqls.SELECT_AWARD_SETTING, "2020-02-08");
+            builder.AppendFormat(OrderSqls.SELECT_AWARD_SETTING, DateTime.Now.ToString("yyyy-MM-dd"));
+            // builder.AppendFormat(OrderSqls.SELECT_AWARD_SETTING, "2020-02-08");
             string sql = builder.ToString();
             DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
             if (dt != null && dt.Rows.Count > 0)
@@ -576,7 +576,7 @@ namespace ACBC.Dao
         public bool checkActiveByDayAndMember(string memberId)
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendFormat(OrderSqls.SELECT_AWARD_BY_DAY_AND_MEMEBER, memberId,"2020-02-08");
+            builder.AppendFormat(OrderSqls.SELECT_AWARD_BY_DAY_AND_MEMEBER, memberId,DateTime.Now.ToString("yyyy-MM-dd"));
             string sql = builder.ToString();
             DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
             if (dt != null && dt.Rows.Count > 0)
