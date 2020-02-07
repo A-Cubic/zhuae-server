@@ -543,7 +543,13 @@ namespace ACBC.Dao
                 foreach (DataRow dr in dt.Rows)
                 {
                     if (dr["MEMBER_NAME"].ToString() == "" || dr["MEMBER_NAME"].ToString() == null) continue;
-                    string award = "恭喜" + dr["MEMBER_NAME"] + "用户获得" + dr["ACTIVE_NAME"];
+
+                    string name = dr["MEMBER_NAME"].ToString();
+                    if (name.Length>2)
+                    {
+                        name = name.Substring(0, 1) + "***" + name.Substring(name.Length-1,1);
+                    }
+                    string award = "恭喜 " + name + " 用户获得 " + dr["ACTIVE_NAME"];
                     awardlist.Add(award);
                 }
             }
