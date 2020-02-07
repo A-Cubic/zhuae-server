@@ -265,49 +265,81 @@ namespace ACBC.Dao
             List<SimpleAwardInfo> list = new List<SimpleAwardInfo>();
             StringBuilder builder = new StringBuilder();
             builder.AppendFormat(OrderSqls.SELECT_AWARD_BY_MEMBERID, memberId);
-            string sql = builder.ToString();
-            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
-            if (dt != null && dt.Rows.Count > 0)
+            if (checkActiveMember(memberId))
             {
-                foreach (DataRow dr in dt.Rows)
+                StringBuilder builder = new StringBuilder();
+                builder.AppendFormat(OrderSqls.SELECT_AWARD_BY_MEMBERID, memberId);
+                string sql = builder.ToString();
+                DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+                if (dt != null && dt.Rows.Count > 0)
                 {
-                    string date = Convert.ToDateTime(dr["temp_day"]).ToString("M月dd日");
-                    int state = 0;
-                    List<string> goods = new List<string>();
-                    if (dr["ACTIVE_NAME"].ToString() != "")
+                    foreach (DataRow dr in dt.Rows)
                     {
-                        string[] sts = dr["ACTIVE_NAME"].ToString().Split(",");
-                        foreach (var st in sts)
+                        string date = Convert.ToDateTime(dr["temp_day"]).ToString("M月dd日");
+                        int state = 0;
+                        List<string> goods = new List<string>();
+                        if (dr["ACTIVE_NAME"].ToString() != "")
                         {
-                            goods.Add(st);
-                        }
-                        state = 1;
-                    }
-                    else
-                    {
-                        if (Convert.ToDateTime(dr["temp_day"]).AddDays(1) < DateTime.Now)
-                        {
-                            state = 2;
-                            string st = "已经过期";
-                            goods.Add(st);
+                            string[] sts = dr["ACTIVE_NAME"].ToString().Split(",");
+                            foreach (var st in sts)
+                            {
+                                goods.Add(st);
+                            }
+                            state = 1;
                         }
                         else
                         {
-                            state = 0;
-                            string st = "敬请期待";
-                            goods.Add(st);
+                            if (Convert.ToDateTime(dr["temp_day"]).AddDays(1) < DateTime.Now)
+                            {
+                                state = 2;
+                                string st = "已经过期";
+                                goods.Add(st);
+                            }
+                            else
+                            {
+                                state = 0;
+                                string st = "敬请期待";
+                                goods.Add(st);
+                            }
                         }
+                        SimpleAwardInfo simpleAwardInfo = new SimpleAwardInfo
+                        {
+                            active_day = date,
+                            state = state,
+                            goods = goods
+                        };
+                        list.Add(simpleAwardInfo);
                     }
-                    SimpleAwardInfo simpleAwardInfo = new SimpleAwardInfo
-                    {
-                        active_day = date,
-                        state = state,
-                        goods = goods
-                    };
-                    list.Add(simpleAwardInfo);
-                }
 
+                }
             }
+            else
+            {
+                List<string> goods = new List<string>();
+                goods.Add("未参与活动");
+                SimpleAwardInfo simpleAwardInfo = new SimpleAwardInfo
+                {
+                    active_day = "2月8日",
+                    state = 2,
+                    goods = goods
+                };
+                list.Add(simpleAwardInfo);
+                SimpleAwardInfo simpleAwardInfo1 = new SimpleAwardInfo
+                {
+                    active_day = "2月9日",
+                    state = 2,
+                    goods = goods
+                };
+                list.Add(simpleAwardInfo1);
+                SimpleAwardInfo simpleAwardInfo2 = new SimpleAwardInfo
+                {
+                    active_day = "2月10日",
+                    state = 2,
+                    goods = goods
+                };
+                list.Add(simpleAwardInfo2);
+            }
+            
 
             return list;
 
@@ -401,8 +433,7 @@ namespace ACBC.Dao
                     coin = random.Next(min, max);
                     StringBuilder builder1 = new StringBuilder();
                     builder1.AppendFormat(OrderSqls.INSERT_AWARD_INFO, memberId, drs[0]["AWARD_TYPE"].ToString(),
-                                           drs[0]["AWARD_NAME"].ToString(), drs[0]["AWARD_NUM"].ToString(),
-                                           drs[0]["AWARD_BARCODE"].ToString() );
+                                           drs[0]["AWARD_NAME"].ToString(), coin, drs[0]["AWARD_BARCODE"].ToString() );
                     al.Add(builder1.ToString());
                 }
                 DataRow[] drs1 = dt.Select(" AWARD_TYPE='2' ");
@@ -413,9 +444,8 @@ namespace ACBC.Dao
                     Random random = new Random();
                     heart = random.Next(min, max);
                     StringBuilder builder1 = new StringBuilder();
-                    builder1.AppendFormat(OrderSqls.INSERT_AWARD_INFO, memberId, drs[0]["AWARD_TYPE"].ToString(),
-                                           drs[0]["AWARD_NAME"].ToString(), drs[0]["AWARD_NUM"].ToString(),
-                                           drs[0]["AWARD_BARCODE"].ToString());
+                    builder1.AppendFormat(OrderSqls.INSERT_AWARD_INFO, memberId, drs1[0]["AWARD_TYPE"].ToString(),
+                                           drs1[0]["AWARD_NAME"].ToString(), heart,drs1[0]["AWARD_BARCODE"].ToString());
                     al.Add(builder1.ToString());
                 }
                 DataRow[] drs2 = dt.Select(" AWARD_TYPE='3' ");
@@ -492,6 +522,57 @@ namespace ACBC.Dao
         { 
             StringBuilder builder = new StringBuilder();
             builder.AppendFormat(OrderSqls.SELECT_AWARD_SETTING_NUM,id);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public List<string> getWinningList()
+        {
+            List<string> awardlist = new List<string>();
+            string select = OrderSqls.SELECT_AWARD_ALL;
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(select, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (dr["MEMBER_NAME"].ToString() == "" || dr["MEMBER_NAME"].ToString() == null) continue;
+                    string award = "恭喜" + dr["MEMBER_NAME"] + "用户获得" + dr["ACTIVE_NAME"];
+                    awardlist.Add(award);
+                }
+            }
+            return awardlist;
+        }
+
+        public bool checkActiveMember(string memberId)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OrderSqls.SELECT_T_ACTIVE_MEMBER_BY_MEMBER_ID, memberId);
+            string sql = builder.ToString();
+            DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public bool checkActiveByDayAndMember(string memberId)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(OrderSqls.SELECT_AWARD_BY_DAY_AND_MEMEBER, memberId,"2020-02-08");
             string sql = builder.ToString();
             DataTable dt = DatabaseOperationWeb.ExecuteSelectDS(sql, "T").Tables[0];
             if (dt != null && dt.Rows.Count > 0)
@@ -617,7 +698,7 @@ namespace ACBC.Dao
 
             public const string SELECT_T_ACTIVE_MEMBER_BY_MEMBER_ID = "" +
                 "SELECT *" +
-                "FROM T_ACTIVE_MEMBER "+
+                "FROM T_ACTIVE_MEMBER " +
                 "WHERE MEMBER_ID = {0}";
 
             public const string INSERT_INTO_T_ACTIVE_MEMBER = "" +
@@ -635,7 +716,7 @@ namespace ACBC.Dao
 
             public const string SELECT_T_ACTIVE_INFO_BY_ACTIVE_STAGE = "" +
                 "SELECT * " +
-                "FROM T_ACTIVE_INFO "+
+                "FROM T_ACTIVE_INFO " +
                 "WHERE ACTIVE_STAGE = {0}";
 
             public const string INSERT_INTO_T_ACTIVE_LIST = "" +
@@ -663,14 +744,21 @@ namespace ACBC.Dao
                 "SELECT * FROM T_ACTIVE_TEMP T " +
                 "LEFT JOIN (SELECT ACTIVE_DAY, GROUP_CONCAT(CONCAT_WS(' ', AWARD_NAME, AWARD_NUM)) ACTIVE_NAME " +
                             "FROM T_ACTIVE_AWARD " +
-                            "WHERE MEMBER_ID = 1001 " +
+                            "WHERE MEMBER_ID = {0} " +
                             "GROUP BY ACTIVE_DAY) A " +
                 "ON T.TEMP_DAY = ACTIVE_DAY";
+
+            public const string SELECT_AWARD_ALL = "" +
+                "SELECT   M.MEMBER_NAME, GROUP_CONCAT(CONCAT_WS(' ', AWARD_NAME, AWARD_NUM)) ACTIVE_NAME " +
+                "FROM T_ACTIVE_AWARD A,T_ACTIVE_MEMBER M " +
+                "WHERE A.MEMBER_ID = M.MEMBER_ID " +
+                "GROUP BY A.ACTIVE_DAY,A.MEMBER_ID " +
+                "ORDER BY MAX(A.ID) DESC LIMIT 10  ";
 
             public const string SELECT_AWARD_INFO_BY_MEMBERID = "" +
                 "SELECT ACTIVE_DAY,GROUP_CONCAT(CONCAT_WS('#',AWARD_TYPE,AWARD_NAME,AWARD_NUM,REMARK) ) ACTIVE_NAME " +
                 "FROM T_ACTIVE_AWARD " +
-                "WHERE MEMBER_ID = 1001 " +
+                "WHERE MEMBER_ID = {0} " +
                 "GROUP BY ACTIVE_DAY " +
                 "ORDER BY ACTIVE_DAY ASC";
 
@@ -686,10 +774,13 @@ namespace ACBC.Dao
             public const string INSERT_AWARD_INFO = "" +
                 "INSERT INTO T_ACTIVE_AWARD(ACTIVE_ID,MEMBER_ID,CREATE_TIME,STATE,ACTIVE_DAY," +
                 "AWARD_TYPE,AWARD_NAME,AWARD_NUM,AWARD_BARCODE,REMARK) " +
-                "VALUES (1,{0},NOW(),'0',NOW(),'{1}','{2}','{3}','{4}','未领取')";
+                "VALUES (1,{0},NOW(),'0',NOW(),'{1}','{2}','{3}','{4}','未发放')";
 
             public const string SELECT_AWARD_SETTING_NUM = "" +
                 "SELECT * FROM T_ACTIVE_AWARD_SETTING WHERE ID = '{0}' AND AWARD_NUM > 0 ";
+
+            public const string SELECT_AWARD_BY_DAY_AND_MEMEBER = "" +
+                "SELECT * FROM T_ACTIVE_AWARD WHERE ID = '{0}' AND ACTIVE_DAY ='{1}' ";
             /**********************************
             public const string SELECT_QBUY_LIST_BY_MEMBER_ID = ""
                 + "SELECT BQ.* ,BA.REMARK ,S.STORE_NAME " +

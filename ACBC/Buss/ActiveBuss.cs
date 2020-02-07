@@ -238,13 +238,33 @@ namespace ACBC.Buss
             string memberId = Utils.GetMemberID(baseApi.token);
 
             ActiveDao activeDao = new ActiveDao();
-            return activeDao.OpenBox(memberId);
+            if (activeDao.checkActiveMember(memberId))
+            {
+                if (!activeDao.checkActiveByDayAndMember(memberId))
+                {
+                    return activeDao.OpenBox(memberId);
+                }
+                else
+                {
+                    throw new ApiException(CodeMessage.ActiveJoinedError, "ActiveJoinedError");
+                }
+            }
+            else
+            {
+                throw new ApiException(CodeMessage.NoActiveMemberError, "NoActiveMemberError");
+            }
+            
         }
 
         public object Do_GetRankingAward(BaseApi baseApi)
         {
             ActiveDao activeDao = new ActiveDao();
             return activeDao.getRankingAward();
+        }
+        public object Do_GetWinningListInfo(BaseApi baseApi)
+        {
+            ActiveDao activeDao = new ActiveDao();
+            return activeDao.getWinningList();
         }
 
         /****************************

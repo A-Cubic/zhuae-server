@@ -91,5 +91,8 @@ namespace ACBC.Common
         ACCOUNTExists = 20008,
         ACCOUNTZEExists = 20009,
         UpdateResellerTypeError = 20010,
+
+        NoActiveMemberError = 30001,
+        ActiveJoinedError=30002,
     }
 }
