@@ -747,7 +747,7 @@ namespace ACBC.Dao
                 "ON T.TEMP_DAY = ACTIVE_DAY";
 
             public const string SELECT_AWARD_ALL = "" +
-                "SELECT   M.MEMBER_NAME, GROUP_CONCAT(CONCAT_WS(' ', AWARD_NAME, AWARD_NUM)) ACTIVE_NAME " +
+                "SELECT   M.MEMBER_NAME, GROUP_CONCAT(CONCAT_WS(' ', AWARD_NAME, AWARD_NUM) ORDER BY A.ID) ACTIVE_NAME " +
                 "FROM T_ACTIVE_AWARD A,T_ACTIVE_MEMBER M " +
                 "WHERE A.MEMBER_ID = M.MEMBER_ID " +
                 "GROUP BY A.ACTIVE_DAY,A.MEMBER_ID " +
